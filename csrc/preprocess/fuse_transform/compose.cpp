@@ -52,7 +52,7 @@ class MMDEPLOY_API Compose : public FuseTransform {
       output = std::move(t);
     }
     // one big kernel
-    // shoud set correct input Tensor of output["img"]
+    // should set correct input Tensor of output["img"]
     fuse_kernel_->Process(output);
     // end of one big kernel
     OUTCOME_TRY(stream_.Wait());
