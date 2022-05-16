@@ -7,6 +7,7 @@
 #include "core/utils/formatter.h"
 #include "experimental/module_adapter.h"
 #include "preprocess/transform/transform.h"
+#include "preprocess/fuse_transform/fuse_transform.h"
 
 namespace mmdeploy {
 
@@ -14,7 +15,7 @@ TransformModule::~TransformModule() = default;
 
 TransformModule::TransformModule(const Value& args) {
   const auto type = "Compose";
-  auto creator = Registry<Transform>::Get().GetCreator(type, 1);
+  auto creator = Registry<FuseTransform>::Get().GetCreator(type, 1);
   if (!creator) {
     MMDEPLOY_ERROR("unable to find creator: {}", type);
     throw_exception(eEntryNotFound);

@@ -4,10 +4,12 @@
 #define MMDEPLOY_SRC_MODULE_TRANSFORM_MODULE_H_
 
 #include "core/value.h"
+#include "core/module.h"
 
 namespace mmdeploy {
 
 class Transform;
+class FuseTransform;
 
 class TransformModule {
  public:
@@ -17,7 +19,7 @@ class TransformModule {
   Result<Value> operator()(const Value& input);
 
  private:
-  std::unique_ptr<Transform> transform_;
+  std::unique_ptr<Module> transform_;
 };
 
 }  // namespace mmdeploy
