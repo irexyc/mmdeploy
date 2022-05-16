@@ -15,16 +15,11 @@ class FuseTransformKernel : public ::mmdeploy::FuseTransformKernel {
     "img_metas":Object{...},
     "ori_img":"<any>",
     "trans_info":{
-        "runtime_args":Array[9],
-        "static":Array[8]
+        "runtime_args":Array[7],
+        "static":Array[7]
     }
 }
-
-
-
 */
-
-
     return input;
   }
 };

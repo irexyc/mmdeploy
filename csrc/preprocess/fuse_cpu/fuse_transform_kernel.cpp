@@ -9,6 +9,17 @@ class FuseTransformKernel : public ::mmdeploy::FuseTransformKernel {
   explicit FuseTransformKernel(const Value& args) : ::mmdeploy::FuseTransformKernel(args) {}
   Result<Value> Process(const Value& input) {
     MMDEPLOY_INFO("input, {}", to_json(input).dump(2));
+/*
+{
+    "img":null,
+    "img_metas":Object{...},
+    "ori_img":"<any>",
+    "trans_info":{
+        "runtime_args":Array[7],
+        "static":Array[7]
+    }
+}
+*/
     return input;
   }
 };
