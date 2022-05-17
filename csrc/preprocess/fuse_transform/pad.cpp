@@ -55,40 +55,18 @@ class MMDEPLOY_API Pad : public FuseTransform {
     Value trans_info;
 
     std::array<int, 4> padding{0, 0, 0, 0};
+    std::vector<int> after_pad_shape;
     if (arg_.pad_to_square) {
       int max_size = std::max(height, width);
       padding = {0, 0, max_size - width, max_size - height};
       output["pad_fixed_size"].push_back(max_size);
       output["pad_fixed_size"].push_back(max_size);
-      output["img_shape"] = {1, max_size, max_size, channel};
-      trans_info["static"].push_back({{"type", "Pad"},
-                                      {"pad_to_square", true},
-                                      {"size_divisor", 1},
-                                      {"pad_val", arg_.pad_val},
-                                      {"tlbr", {-1, -1, -1, -1}}});
-      trans_info["runtime_args"].push_back({{"tlbr", {0, 0, max_size - height, max_size - width}}});
-      if (img_shape_fixed) {
-        trans_info["static"].back()["tlbr"] = {0, 0, max_size - height, max_size - width};
-      } else {
-        img_shape_fixed = false;
-      }
+      after_pad_shape = {1, max_size, max_size, channel};
     } else if (arg_.size[0] != 0 && arg_.size[1] != 0) {
       padding = {0, 0, arg_.size[1] - width, arg_.size[0] - height};
       output["pad_fixed_size"].push_back(arg_.size[0]);
       output["pad_fixed_size"].push_back(arg_.size[1]);
-      output["img_shape"] = {1, arg_.size[0], arg_.size[1], channel};
-      trans_info["static"].push_back({{"type", "Pad"},
-                                      {"pad_to_square", false},
-                                      {"size_divisor", 1},
-                                      {"pad_val", arg_.pad_val},
-                                      {"tlbr", {-1, -1, -1, -1}}});
-      trans_info["runtime_args"].push_back(
-          {{"tlbr", {0, 0, arg_.size[0] - height, arg_.size[1] - width}}});
-      if (img_shape_fixed) {
-        trans_info["static"].back()["tlbr"] = {0, 0, arg_.size[0] - height, arg_.size[1] - width};
-      } else {
-        img_shape_fixed = false;
-      }
+      after_pad_shape = {1, arg_.size[0], arg_.size[1], channel};
     } else if (arg_.size_divisor != 1) {
       auto pad_h = (height + arg_.size_divisor - 1) / arg_.size_divisor * arg_.size_divisor;
       auto pad_w = (width + arg_.size_divisor - 1) / arg_.size_divisor * arg_.size_divisor;
@@ -96,23 +74,32 @@ class MMDEPLOY_API Pad : public FuseTransform {
       output["pad_size_divisor"] = arg_.size_divisor;
       output["pad_fixed_size"].push_back(pad_h);
       output["pad_fixed_size"].push_back(pad_w);
-      output["img_shape"] = {1, pad_h, pad_w, channel};
-      trans_info["static"].push_back({{"type", "Pad"},
-                                      {"pad_to_square", false},
-                                      {"size_divisor", arg_.size_divisor},
-                                      {"pad_val", arg_.pad_val},
-                                      {"tlbr", {-1, -1, -1, -1}}});
-      trans_info["runtime_args"].push_back({{"tlbr", {0, 0, pad_h - height, pad_w - width}}});
-      if (img_shape_fixed) {
-        trans_info["static"].back()["tlbr"] = {0, 0, pad_h - height, pad_w - width};
-      } else {
-        img_shape_fixed = false;
-      }
+      after_pad_shape = {1, pad_h, pad_w, channel};
     } else {
       output["pad_fixed_size"].push_back(height);
       output["pad_fixed_size"].push_back(width);
+      after_pad_shape = {1, height, width, channel};
     }
-    output["_img_shape_fixed"] = img_shape_fixed;
+    output["img_shape"] = {after_pad_shape[0], after_pad_shape[1], after_pad_shape[2],
+                           after_pad_shape[3]};
+
+    // need pad
+    if (std::count(begin(padding), end(padding), 0) != 4) {
+      if (img_shape_fixed) {
+        trans_info["static"].push_back({{"type", "Pad"},
+                                        {"dynamic", false},
+                                        {"pad_val", arg_.pad_val},
+                                        {"tlbr", {padding[1], padding[0], padding[3], padding[2]}},
+                                        {"size_hw", {after_pad_shape[1], after_pad_shape[2]}}});
+        trans_info["runtime_args"].push_back({});
+      } else {
+        trans_info["static"].push_back(
+            {{"type", "Pad"}, {"dynamic", true}, {"pad_val", arg_.pad_val}});
+        trans_info["runtime_args"].push_back(
+            {{"tlbr", {padding[1], padding[0], padding[3], padding[2]}},
+             {"size_hw", {after_pad_shape[1], after_pad_shape[2]}}});
+      }
+    }
 
     AddTransInfo(trans_info, output);
     assert(CheckTraceInfoLengthEqual(output) == true);

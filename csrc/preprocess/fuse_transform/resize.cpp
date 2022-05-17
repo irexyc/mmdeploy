@@ -106,26 +106,19 @@ class MMDEPLOY_API Resize : public FuseTransform {
     output["scale_factor"] = {w_scale, h_scale, w_scale, h_scale};
     output["img_shape"] = {1, dst_h, dst_w, channel};
     output["keep_ratio"] = arg_.keep_ratio;
-    output["_img_shape_fixed"] = arg_.keep_ratio == false && fixed_scale;
 
     // trace static info & runtime args
-    // TODO:
-    //   There are some cases not considered. Like adaptive side, scale_factor
     Value trans_info;
-    if (arg_.keep_ratio) {
-      trans_info["static"].push_back({{"type", "Resize"},
-                                      {"keep_ratio", true},
-                                      {"scale", {max_short_edge, max_long_edge}},
-                                      {"interpolation", arg_.interpolation}});
+    bool img_shape_fixed = arg_.keep_ratio == false && fixed_scale;
+    output["_img_shape_fixed"] = img_shape_fixed;
+    trans_info["static"].push_back(
+        {{"type", "Resize"}, {"interpolation", arg_.interpolation}, {"dynamic", !img_shape_fixed}});
+    if (img_shape_fixed) {
+      trans_info["static"].back()["size_hw"] = {dst_h, dst_w};
+      trans_info["runtime_args"].push_back({});
     } else {
-      trans_info["static"].push_back(
-          {{"type", "Resize"},
-           {"keep_ratio", false},
-           {"scale", {dst_h, dst_w}},  // in some cases, it is not static.
-           {"interpolation", arg_.interpolation}});
+      trans_info["runtime_args"].push_back({{"size_hw", {dst_h, dst_w}}});
     }
-    trans_info["runtime_args"].push_back({{"scale", {dst_h, dst_w}}});
-
     AddTransInfo(trans_info, output);
     assert(CheckTraceInfoLengthEqual(output) == true);
 

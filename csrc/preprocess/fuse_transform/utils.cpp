@@ -7,6 +7,9 @@
 namespace mmdeploy {
 
 void AddTransInfo(Value& trans_info, Value& output) {
+  if (!trans_info.contains("static") || !trans_info.contains("runtime_args")) {
+    return;
+  }
   for (auto&& val : trans_info["static"]) {
     output["trans_info"]["static"].push_back(val);
   }
@@ -16,7 +19,12 @@ void AddTransInfo(Value& trans_info, Value& output) {
 }
 
 bool CheckTraceInfoLengthEqual(Value& output) {
-  return output["trans_info"]["static"].size() == output["trans_info"]["runtime_args"].size();
+  if (output.contains("trans_info")) {
+    auto& trans_info = output["trans_info"];
+    if (trans_info.contains("static") && trans_info.contains("runtime_args")) {
+      return trans_info["static"].size() == trans_info["runtime_args"].size();
+    }
+  }
 }
 
 }  // namespace mmdeploy

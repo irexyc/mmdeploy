@@ -57,14 +57,21 @@ class MMDEPLOY_API CenterCrop : public FuseTransform {
     }
 
     // trace static info & runtime args
+    output["_img_shape_fixed"] = true;
     Value trans_info;
     if (img_shape_fixed) {
-      trans_info["static"].push_back(
-          {{"type", "CenterCrop"}, {"tlbr", {y1, x1, h - shape[1] - y1, w - shape[2] - x1}}});
+      trans_info["static"].push_back({{"type", "CenterCrop"},
+                                      {"tlbr", {y1, x1, h - shape[1] - y1, w - shape[2] - x1}},
+                                      {"size_hw", {shape[1], shape[2]}},
+                                      {"dynamic", false}});
+      trans_info["runtime_args"].push_back({});
     } else {
-      trans_info["static"].push_back({{"type", "CenterCrop"}, {"tlbr", {-1, -1, -1, -1}}});
+      trans_info["static"].push_back(
+          {{"type", "CenterCrop"}, {"size_hw", {shape[1], shape[2]}}, {"dynamic", true}});
+      trans_info["runtime_args"].push_back(
+          {{"tlbr", {y1, x1, h - shape[1] - y1, w - shape[2] - x1}}});
     }
-    trans_info["runtime_args"].push_back({y1, x1, h - shape[1] - y1, w - shape[2] - x1});
+
     AddTransInfo(trans_info, output);
     assert(CheckTraceInfoLengthEqual(output) == true);
 
