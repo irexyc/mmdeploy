@@ -7,7 +7,7 @@
 
 namespace mmdeploy {
 
-class MMDEPLOY_API Compose : public FuseTransform {
+class Compose : public FuseTransform {
  public:
   explicit Compose(const Value& args, int version = 0) : FuseTransform(args) {
     assert(args.contains("context"));
@@ -53,7 +53,7 @@ class MMDEPLOY_API Compose : public FuseTransform {
     }
     // one big kernel
     // should set correct input Tensor of output["img"]
-    fuse_kernel_->Process(output);
+    // fuse_kernel_->Process(output);
     // end of one big kernel
     OUTCOME_TRY(stream_.Wait());
     return std::move(output);

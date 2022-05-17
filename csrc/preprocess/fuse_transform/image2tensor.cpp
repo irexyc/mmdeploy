@@ -7,7 +7,7 @@
 
 namespace mmdeploy {
 
-class MMDEPLOY_API ImageToTensor : public FuseTransform {
+class ImageToTensor : public FuseTransform {
  public:
   explicit ImageToTensor(const Value& args, int version = 0) : FuseTransform(args) {
     for (auto& key : args["keys"]) {

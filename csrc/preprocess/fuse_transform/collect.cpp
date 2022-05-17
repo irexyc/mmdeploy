@@ -6,7 +6,7 @@
 
 namespace mmdeploy {
 
-class MMDEPLOY_API Collect : public FuseTransform {
+class Collect : public FuseTransform {
  public:
   explicit Collect(const Value& args, int version = 0) : FuseTransform(args) {
     if (!args.contains("keys") || !args["keys"].is_array()) {

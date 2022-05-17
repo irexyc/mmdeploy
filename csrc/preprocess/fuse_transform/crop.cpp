@@ -7,7 +7,7 @@
 
 namespace mmdeploy {
 
-class MMDEPLOY_API CenterCrop : public FuseTransform {
+class CenterCrop : public FuseTransform {
  public:
   explicit CenterCrop(const Value& args, int version = 0) : FuseTransform(args) {
     if (!args.contains(("crop_size"))) {

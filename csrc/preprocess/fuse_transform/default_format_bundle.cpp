@@ -6,7 +6,7 @@
 #include "utils.h"
 
 namespace mmdeploy {
-class MMDEPLOY_API DefaultFormatBundle : public FuseTransform {
+class DefaultFormatBundle : public FuseTransform {
  public:
   explicit DefaultFormatBundle(const Value& args, int version = 0) : FuseTransform(args) {
     if (args.contains("img_to_float") && args["img_to_float"].is_boolean()) {

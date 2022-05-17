@@ -7,7 +7,7 @@
 
 namespace mmdeploy {
 
-class MMDEPLOY_API Pad : public FuseTransform {
+class Pad : public FuseTransform {
  public:
   explicit Pad(const Value& args, int version = 0) : FuseTransform(args) {
     arg_.size[0] = arg_.size[1] = 0;

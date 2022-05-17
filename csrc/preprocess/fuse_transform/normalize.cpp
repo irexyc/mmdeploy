@@ -7,7 +7,7 @@
 
 namespace mmdeploy {
 
-class MMDEPLOY_API Normalize : public FuseTransform {
+class Normalize : public FuseTransform {
  public:
   explicit Normalize(const Value& args, int version = 0) : FuseTransform(args) {
     if (!args.contains("mean") || !args.contains("std")) {

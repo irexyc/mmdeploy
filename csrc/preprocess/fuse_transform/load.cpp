@@ -43,7 +43,7 @@ std::string DataTypeToString(DataType dt) {
   throw_exception(eInvalidArgument);
 }
 
-class MMDEPLOY_API LoadImageFromFile : public FuseTransform {
+class LoadImageFromFile : public FuseTransform {
  public:
   explicit LoadImageFromFile(const Value& args, int version = 0) : FuseTransform(args) {
     arg_.to_float32 = args.value("to_float32", false);

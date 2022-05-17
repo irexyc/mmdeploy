@@ -10,7 +10,7 @@ using namespace std;
 
 namespace mmdeploy {
 
-class MMDEPLOY_API Resize : public FuseTransform {
+class Resize : public FuseTransform {
  public:
   explicit Resize(const Value& args, int version = 0) : FuseTransform(args) {
     arg_.keep_ratio = args.value<bool>("keep_ratio", false);
