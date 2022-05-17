@@ -1,0 +1,72 @@
+// Copyright (c) OpenMMLab. All rights reserved.
+
+#include <chrono>
+#include <fstream>
+
+#include "archive/json_archive.h"
+#include "core/logger.h"
+#include "core/mat.h"
+#include "json.hpp"
+#include "preprocess/transform_module.h"
+#include "opencv_utils.h"
+
+using namespace mmdeploy;
+using namespace std;
+using nlohmann::json;
+
+int main(int argc, char* argv[]) {
+  if (argc < 4) {
+    std::cerr << "usage: preprocess <cpu or cuda> <path/of/preprocess/config/json/file> "
+                 "<path/of/an/image>"
+              << std::endl;
+  }
+
+  auto platform = argv[1];
+  auto cfg_path = argv[2];
+  auto img_path = argv[3];
+
+  // read preprocess config json file
+  ifstream ifs(cfg_path);
+  if (!ifs.is_open()) {
+    std::cerr << "failed to open preprocess config file: " << cfg_path << std::endl;
+    return -1;
+  }
+  std::string json_cfg((std::istreambuf_iterator<char>(ifs)), std::istreambuf_iterator<char>());
+
+  try {
+    // Create a `TransformModule` instance using `cfg`
+    std::cout << "create an instance of `TransformModule`" << std::endl;
+    auto value_cfg = ::mmdeploy::from_json<Value>(json::parse(json_cfg));
+    auto transform_cfg = value_cfg["pipeline"]["tasks"][0];
+
+    const Device device{platform};
+    Stream stream{device};
+    transform_cfg["context"]["device"] = device;
+    transform_cfg["context"]["stream"] = stream;
+
+    TransformModule transform_module(transform_cfg);
+
+    // Prepare input data for `transform_module`
+    std::cout << "read an image and convert it to `Value`" << std::endl;
+    auto mat = cv::imread(img_path, cv::IMREAD_COLOR);
+    auto mmdeploy_mat = cpu::CVMat2Mat(mat, PixelFormat::kBGR);
+    Value input{{"ori_img", mmdeploy_mat}};
+
+    // Do image preprocessing
+    MMDEPLOY_INFO("start to do image processing on '{}'", platform);
+    constexpr int test_count = 5000;
+    auto t0 = std::chrono::high_resolution_clock::now();
+    for (int i = 0; i < test_count; ++i) {
+      auto output = transform_module(input);
+      assert(!output.has_error());
+    }
+    auto t1 = std::chrono::high_resolution_clock::now();
+    MMDEPLOY_INFO("end to do image processing, cost: {}ms",
+         std::chrono::duration<double, std::milli>(t1 - t0).count() / test_count);
+  } catch (const std::exception& e) {
+    std::cerr << "Exception happened: " << e.what() << std::endl;
+    return -1;
+  }
+
+  return 0;
+}

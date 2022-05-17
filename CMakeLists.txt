@@ -28,6 +28,7 @@ set(MMDEPLOY_TARGET_DEVICES
         "cpu" CACHE STRING "MMDeploy's target devices")
 set(MMDEPLOY_TARGET_BACKENDS "" CACHE STRING "MMDeploy's target inference engines")
 set(MMDEPLOY_CODEBASES "all"  CACHE STRING "select OpenMMLab's codebases")
+option(MMDEPLOY_BUILD_PREPROCESS_EXAMPLE "MMDeploy's example" ON)
 
 if (NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release CACHE STRING "choose 'Release' as default build type" FORCE)
@@ -81,6 +82,10 @@ if (MMDEPLOY_BUILD_SDK)
     install(EXPORT MMDeployTargets
             FILE MMDeployTargets.cmake
             DESTINATION lib/cmake/MMDeploy)
+
+    if (MMDEPLOY_BUILD_PREPROCESS_EXAMPLE)
+        add_subdirectory(demo/preprocess)
+    endif()
 
     # append backend deps
     mmdeploy_add_deps(trt BACKENDS ${MMDEPLOY_TARGET_BACKENDS} DEPS TENSORRT CUDNN)

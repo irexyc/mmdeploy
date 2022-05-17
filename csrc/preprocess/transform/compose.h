@@ -16,6 +16,7 @@ class MMDEPLOY_API Compose : public Transform {
 
  private:
   std::vector<std::unique_ptr<Transform>> transforms_;
+  std::vector<std::string> transform_types_;
   Stream stream_;
 };
 

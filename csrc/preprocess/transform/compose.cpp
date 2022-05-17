@@ -29,21 +29,31 @@ Compose::Compose(const Value& args, int version) : Transform(args) {
       throw std::invalid_argument("failed to create transform");
     }
     transforms_.push_back(std::move(transform));
+    transform_types_.push_back(type);
   }
 }
 
 Result<Value> Compose::Process(const Value& input) {
   Value output = input;
   Value::Array intermediates;
-  for (auto& transform : transforms_) {
+  for (int i = 0; i < transforms_.size(); ++i) {
+    auto& transform = transforms_[i];
+    auto& name = transform_types_[i];
+    auto t0 = std::chrono::high_resolution_clock::now();
+
     OUTCOME_TRY(auto t, transform->Process(output));
     if (auto it = t.find("__data__"); it != t.end()) {
       std::move(it->begin(), it->end(), std::back_inserter(intermediates));
       it->array().clear();
     }
     output = std::move(t);
+    OUTCOME_TRY(stream_.Wait());
+
+    auto t1 = std::chrono::high_resolution_clock::now();
+    MMDEPLOY_INFO("transform cost: {}ms, name: {}",
+                  std::chrono::duration<double, std::milli>(t1 - t0).count(), name);
   }
-  OUTCOME_TRY(stream_.Wait());
+
   return std::move(output);
 }
 

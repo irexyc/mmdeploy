@@ -6,16 +6,17 @@
 #include "core/module.h"
 #include "core/utils/formatter.h"
 #include "experimental/module_adapter.h"
-#include "preprocess/transform/transform.h"
 #include "preprocess/fuse_transform/fuse_transform.h"
+#include "preprocess/transform/transform.h"
 
 namespace mmdeploy {
 
 TransformModule::~TransformModule() = default;
 
-TransformModule::TransformModule(const Value& args) {
+template <typename T>
+void InitTransormModule(const Value& args, std::unique_ptr<Module>& transform) {
   const auto type = "Compose";
-  auto creator = Registry<FuseTransform>::Get().GetCreator(type, 1);
+  auto creator = Registry<T>::Get().GetCreator(type, 1);
   if (!creator) {
     MMDEPLOY_ERROR("unable to find creator: {}", type);
     throw_exception(eEntryNotFound);
@@ -27,7 +28,17 @@ TransformModule::TransformModule(const Value& args) {
     cfg["context"]["device"] = device;
     cfg["context"]["stream"] = Stream::GetDefault(device);
   }
-  transform_ = creator->Create(cfg);
+
+  transform = creator->Create(cfg);
+}
+
+TransformModule::TransformModule(const Value& args) {
+  bool can_fuse = args.value("fuse_transform", false);
+  if (can_fuse) {
+    InitTransormModule<FuseTransform>(args, transform_);
+  } else {
+    InitTransormModule<Transform>(args, transform_);
+  }
 }
 
 Result<Value> TransformModule::operator()(const Value& input) {
