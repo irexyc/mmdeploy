@@ -12,7 +12,7 @@ if ("cuda" IN_LIST MMDEPLOY_TARGET_DEVICES)
 endif ()
 
 include(${CMAKE_SOURCE_DIR}/cmake/MMDeploy.cmake)
-mmdeploy_add_module(${PROJECT_NAME} transform_module.cpp)
+mmdeploy_add_module(${PROJECT_NAME} LIBRARY transform_module.cpp)
 target_link_libraries(${PROJECT_NAME} PRIVATE mmdeploy::transform
     mmdeploy::fuse_transform)
 add_library(mmdeploy::transform_module ALIAS ${PROJECT_NAME})

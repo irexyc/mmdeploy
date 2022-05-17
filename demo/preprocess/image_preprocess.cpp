@@ -15,15 +15,23 @@ using namespace std;
 using nlohmann::json;
 
 int main(int argc, char* argv[]) {
-  if (argc < 4) {
+  if (argc < 5) {
     std::cerr << "usage: preprocess <cpu or cuda> <path/of/preprocess/config/json/file> "
-                 "<path/of/an/image>"
+                 "<path/of/an/image> <fuse>"
               << std::endl;
   }
 
   auto platform = argv[1];
   auto cfg_path = argv[2];
   auto img_path = argv[3];
+
+  auto fuse = false;
+  if (argc == 5 && atoi(argv[4]) != 0) {
+    MMDEPLOY_WARN("using fuse-transform mode");
+    fuse = true;
+  } else {
+    MMDEPLOY_WARN("using normal-transform mode");
+  }
 
   // read preprocess config json file
   ifstream ifs(cfg_path);
@@ -43,6 +51,11 @@ int main(int argc, char* argv[]) {
     Stream stream{device};
     transform_cfg["context"]["device"] = device;
     transform_cfg["context"]["stream"] = stream;
+    if (fuse) {
+      transform_cfg["fuse_transform"] = true;
+    } else {
+      transform_cfg["fuse_transform"] = false;
+    }
 
     TransformModule transform_module(transform_cfg);
 

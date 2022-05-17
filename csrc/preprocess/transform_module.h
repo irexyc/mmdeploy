@@ -11,7 +11,7 @@ namespace mmdeploy {
 class Transform;
 class FuseTransform;
 
-class TransformModule {
+class MMDEPLOY_API TransformModule {
  public:
   ~TransformModule();
   explicit TransformModule(const Value& args);
