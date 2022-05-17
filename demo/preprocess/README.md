@@ -10,5 +10,111 @@ make -j10
 
 ## Run preprocess example
 ```bash
-./bin/preprocess <cpu or cuda> <path/of/preprocess/config/json/file> <path/of/an/image>
+./bin/preprocess <cpu or cuda> <path/of/preprocess/config/json/file> <path/of/an/image> <fuse>
+
+fuse 为0即为之前的pipeline，fuse 为1即为trace的pipeline
+```
+
+## Trace information
+
+
+### cvtColorBGR
+
+```
+// static
+{
+    "type", "cvtColorBGR"
+}
+
+// runtime_args
+{
+    "src_pixel_format": "BGR"
+}
+```
+
+###  CastFloat
+```
+// static
+{
+    "type", "CastFloat"
+}
+// runtime_args
+{
+    "src_data_type": "Int8"
+}
+```
+
+### Normalize
+```
+// static
+{
+    "type"" "Normalize",
+    "mean"" [0, 0, 0], // may be length 1 or 3
+    "std": [0, 0, 0],
+}
+// runtime_args
+null
+```
+
+### Pad
+```
+// case 1. 之前的size可固定
+// static
+{
+    "type": "Pad",
+    "dynamic": false,
+    "pad_val": 0,
+    "tlbr": [0, 0, 0, 0],
+    "size_hw": [0, 0],
+};
+// runtime_args
+null
+
+// case 2. 之前的size不确定
+// static
+{
+    "type": "Pad",
+    "dynamic": true,
+    "pad_val": 0
+}
+// runtime_args
+{
+    "tlbr": [0, 0, 0, 0],
+    "size_hw", [0, 0]
+}
+```
+
+### Crop
+```
+// case 1. 之前的size可固定
+// static
+{
+    "type": "CenterCrop",
+    "tlbr": [0, 0, 0, 0],
+    "size_hw": [0, 0],
+    "dynamic": false
+}
+// runtime_args
+null
+
+// case 2. 之前的size不确定
+// static
+{
+    "type": "CenterCrop",
+    "size_hw": [0, 0],
+    "dynamic", true
+}
+// runtime_args
+{
+    "tlbr": [0, 0, 0, 0]
+}
+```
+### HWC2CHW
+```
+// static
+{
+    "type": "HWC2CHW"
+}
+// runtime_args
+null
 ```

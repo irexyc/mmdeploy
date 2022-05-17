@@ -72,6 +72,19 @@ int main(int argc, char* argv[]) {
     for (int i = 0; i < test_count; ++i) {
       auto output = transform_module(input);
       assert(!output.has_error());
+
+      // Value out = output.value();
+      // MMDEPLOY_INFO("output: {}", to_json(out).dump(2));
+      // Mat src_mat = out["ori_img"].get<Mat>();
+      // int height = src_mat.height();
+      // int width = src_mat.width();
+      // int channel = src_mat.channel();
+      // PixelFormat pft = src_mat.pixel_format();
+      // DataType dt = src_mat.type();
+      // char* raw_data = src_mat.data<char>();
+
+      // Value info_static = out["trans_info"]["static"];
+      // Value info_runtime_args = out["trans_info"]["runtime_args"];
     }
     auto t1 = std::chrono::high_resolution_clock::now();
     MMDEPLOY_INFO("end to do image processing, cost: {}ms",
