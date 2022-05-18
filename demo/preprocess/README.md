@@ -44,6 +44,33 @@ fuse 为0即为之前的pipeline，fuse 为1即为trace的pipeline
 }
 ```
 
+### Resize
+```
+// case 1. 之前的size可固定
+//static
+{
+    "type": "Resize",
+    "interpolation": "bilinear",
+    "dynamic", false,
+    "size_hw": [0, 0]
+}
+// runtime_args
+null
+
+// case 2. 之前的size不确定
+//static
+{
+    "type": "Resize",
+    "interpolation": "bilinear",
+    "dynamic", true,
+}
+
+// runtime_args
+```
+{
+    "size_hw": [0, 0]
+}
+
 ### Normalize
 ```
 // static
