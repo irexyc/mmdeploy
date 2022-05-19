@@ -27,6 +27,7 @@ class Collect : public FuseTransform {
     }
     // trace info
     arg_.keys.push_back("trans_info");
+    arg_.keys.push_back("_img_shape");
   }
   ~Collect() override = default;
 

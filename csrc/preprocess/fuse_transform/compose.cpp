@@ -48,6 +48,8 @@ class Compose : public FuseTransform {
       MMDEPLOY_INFO("transform avg-cost: {}ms, name: trace-{}", d[i + 1] / run_times,
                     transform_types_[i]);
     }
+    MMDEPLOY_INFO("transform avg-cost: {}ms, name: trace-fuse",
+                  d[transforms_.size() + 1] / run_times);
   }
 
   Result<Value> Process(const Value& input) override {
@@ -70,7 +72,12 @@ class Compose : public FuseTransform {
     }
     // one big kernel
     // should set correct input Tensor of output["img"]
-    // fuse_kernel_->Process(output);
+    auto t0 = std::chrono::high_resolution_clock::now();
+
+    fuse_kernel_->Process(output);
+
+    auto t1 = std::chrono::high_resolution_clock::now();
+    d[transforms_.size() + 1] += std::chrono::duration<double, std::milli>(t1 - t0).count();
     // end of one big kernel
     run_times++;
     OUTCOME_TRY(stream_.Wait());

@@ -80,8 +80,8 @@ class Pad : public FuseTransform {
       output["pad_fixed_size"].push_back(width);
       after_pad_shape = {1, height, width, channel};
     }
-    output["img_shape"] = {after_pad_shape[0], after_pad_shape[1], after_pad_shape[2],
-                           after_pad_shape[3]};
+    output["_img_shape"] = {after_pad_shape[0], after_pad_shape[1], after_pad_shape[2],
+                            after_pad_shape[3]};
 
     // need pad
     if (std::count(begin(padding), end(padding), 0) != 4) {
