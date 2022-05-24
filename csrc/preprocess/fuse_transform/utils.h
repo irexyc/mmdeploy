@@ -8,9 +8,14 @@
 
 namespace mmdeploy {
 
-void AddTransInfo(Value& trans_info, Value& output);
+void AddTransInfo(Value &trans_info, Value &output);
 
-bool CheckTraceInfoLengthEqual(Value& output);
+bool CheckTraceInfoLengthEqual(Value &output);
+
+void MMDEPLOY_API extract_runtime_args(Value &output, std::vector<int> &resize_hw, float &pad_val,
+                                       std::vector<int> &padding_tlbr,
+                                       std::vector<int> &padding_size_hw,
+                                       std::vector<int> &crop_tlbr, std::vector<int> &crop_size_hw);
 
 }  // namespace mmdeploy
 

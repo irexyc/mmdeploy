@@ -58,6 +58,7 @@ class CenterCrop : public FuseTransform {
 
     // trace static info & runtime args
     output["_img_shape_fixed"] = true;
+    output["_img_shape"] = {shape[0], shape[1], shape[2], shape[3]};
     Value trans_info;
     if (img_shape_fixed) {
       trans_info["static"].push_back({{"type", "CenterCrop"},

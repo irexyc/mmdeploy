@@ -1,7 +1,10 @@
+#include <sstream>
+
 #include "archive/json_archive.h"
 #include "archive/value_archive.h"
 #include "core/mat.h"
 #include "preprocess/fuse_transform/fuse_transform.h"
+#include "preprocess/fuse_transform/utils.h"
 
 namespace mmdeploy {
 namespace cpu {
@@ -28,6 +31,28 @@ class FuseTransformKernel : public ::mmdeploy::FuseTransformKernel {
     TensorDesc desc = {Device{"cpu"}, DataType::kFLOAT, {1, dst_c, dst_h, dst_w}};
     Tensor img(desc);
     float* dst_raw_data = img.data<float>();
+
+    std::vector<int> resize_hw(2, 0);
+    float pad_val = 0;
+    std::vector<int> padding_tlbr(4, 0);
+    std::vector<int> padding_size_hw(2, 0);
+    std::vector<int> crop_tlbr(4, 0);
+    std::vector<int> crop_size_hw(2, 0);
+    extract_runtime_args(output, resize_hw, pad_val, padding_tlbr, padding_size_hw, crop_tlbr,
+                         crop_size_hw);
+
+    // auto print_vec = [](std::string name, std::vector<int>& vec) {
+    //   std::stringstream ss;
+    //   for (int i = 0; i < vec.size(); i++) {
+    //     ss << vec[i] << " ";
+    //   }
+    //   MMDEPLOY_INFO("{} - {}", name, ss.str());
+    // };
+    // print_vec("padding_tlbr", padding_tlbr);
+    // print_vec("crop_tlbr", crop_tlbr);
+    // print_vec("resize_hw", resize_hw);
+    // print_vec("padding_size_hw", padding_size_hw);
+    // print_vec("crop_size_hw", crop_size_hw);
 
     // call kernel
 
