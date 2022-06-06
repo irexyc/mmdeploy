@@ -67,7 +67,7 @@ int main(int argc, char* argv[]) {
 
     // Do image preprocessing
     MMDEPLOY_INFO("start to do image processing on '{}'", platform);
-    constexpr int test_count = 5000;
+    constexpr int test_count = 5;
     auto t0 = std::chrono::high_resolution_clock::now();
     for (int i = 0; i < test_count; ++i) {
       auto output = transform_module(input);
