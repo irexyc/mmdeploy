@@ -92,7 +92,9 @@ class FuseTransformKernel : public ::mmdeploy::FuseTransformKernel {
     system(codegen_cmd.c_str());
 
     auto cc = (std::string)path + "./source.c";
+    // auto cc = (std::string) "./bin/source.c";
     auto so = (std::string)path + "./libsource.so";
+    // auto so = (std::string) "./bin/libsource.so";
     auto shared_cmd = (std::string) "g++ -shared -fPIC -O3 -o " + so + " " + cc;
     system(shared_cmd.c_str());
 
@@ -115,6 +117,9 @@ class FuseTransformKernel : public ::mmdeploy::FuseTransformKernel {
     int resize_h = resize_hw[0];
     int resize_w = resize_hw[1];
 
+    int crop_top = crop_tlbr[0];
+    int crop_left = crop_tlbr[1];
+
     int pad_h = padding_size_hw[0];
     int pad_w = padding_size_hw[1];
 
@@ -124,7 +129,8 @@ class FuseTransformKernel : public ::mmdeploy::FuseTransformKernel {
     short* cubfw;
     int* inth;
     int* intw;
-    
+
+    auto t0 = std::chrono::high_resolution_clock::now();
     if(resize_h && resize_w ) { // add bilinear judegement
       cubfh = new short[resize_h*2];
       cubfw = new short[resize_w*2];
@@ -134,12 +140,16 @@ class FuseTransformKernel : public ::mmdeploy::FuseTransformKernel {
       resize_preprocess(src_h, src_w, resize_h, resize_w, cubfh, cubfw, inth, intw);
     }
 
-    func_(resize_h, resize_w, cubfh, cubfw, inth, intw, pad_h, pad_w, padding_tlbr[0], padding_tlbr[1], padding_tlbr[2], padding_tlbr[3], src_raw_data, dst_raw_data, src_h, src_w); //dynamic
+    func_(resize_h, resize_w, crop_top, crop_left, pad_h, pad_w, padding_tlbr[0], padding_tlbr[1], padding_tlbr[2], padding_tlbr[3], cubfh, cubfw, inth, intw, src_raw_data, dst_raw_data, src_h, src_w); //dynamic
 
     delete[] cubfh;
     delete[] cubfw;
     delete[] inth;
     delete[] intw;
+
+    auto t1 = std::chrono::high_resolution_clock::now();
+    MMDEPLOY_INFO("elena fused time, cost: {}ms",
+         std::chrono::duration<double, std::milli>(t1 - t0).count());
 
     // float sum = 0.0;
 
