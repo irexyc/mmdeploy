@@ -14,8 +14,6 @@
 #include "preprocess/fuse_transform/fuse_transform.h"
 #include "preprocess/fuse_transform/utils.h"
 
-#include "fuse_impl/common_kernel.h"
-
 namespace mmdeploy {
 namespace cpu {
 class FuseTransformKernel : public ::mmdeploy::FuseTransformKernel {
@@ -74,29 +72,34 @@ class FuseTransformKernel : public ::mmdeploy::FuseTransformKernel {
     mkdtemp(path);
 
     std::string json_path = (std::string)path + "/static.json"; // name maybe change
-
-    //TODO
-    // 1. write the static.json into json_path
-    // 2. generate tag and judge whether it's exist
-
-    std::string elena_path = "./bin/trace_test"; // need put elena exec it in build/bin/.
-
-    FILE *json_file = fopen(json_path.c_str(), "r");
-    FILE *elena_file = fopen(elena_path.c_str(), "r");
-
-    if ( !json_file || !elena_file ) {
-      std::cout << "Error opening json or elena binary file\n";
-      exit(1);
-    }
-    auto codegen_cmd = (std::string) elena_path + " " + json_path;
-    system(codegen_cmd.c_str());
-
-    auto cc = (std::string)path + "./source.c";
+     auto cc = (std::string)path + "./source.c";
     // auto cc = (std::string) "./bin/source.c";
     auto so = (std::string)path + "./libsource.so";
     // auto so = (std::string) "./bin/libsource.so";
-    auto shared_cmd = (std::string) "g++ -shared -fPIC -O3 -o " + so + " " + cc;
-    system(shared_cmd.c_str());
+
+    std::string elena_path = "./bin/trace_test"; // need put elena exec it in build/bin/.
+
+    std::fstream fs_so;
+	  fs_so.open(so, std::ios::in);
+
+    if(!fs_so) {
+      //TODO
+      // 1. write the static.json into json_path
+      // 2. generate tag and judge whether it's exist
+
+      FILE *json_file = fopen(json_path.c_str(), "r");
+      FILE *elena_file = fopen(elena_path.c_str(), "r");
+
+      if ( !json_file || !elena_file ) {
+        std::cout << "Error opening json or elena binary file\n";
+        exit(1);
+      }
+      auto codegen_cmd = (std::string) elena_path + " " + json_path;
+      system(codegen_cmd.c_str());
+    
+      auto shared_cmd = (std::string) "g++ -shared -fPIC -O3 -march=native -o " + so + " " + cc;
+      system(shared_cmd.c_str());
+    }
 
     auto dlHandle_ = dlopen(so.c_str(), RTLD_NOW); // 立即决定 返回前解除所有未决定的符号
     if (!dlHandle_) {
@@ -104,16 +107,14 @@ class FuseTransformKernel : public ::mmdeploy::FuseTransformKernel {
         exit(1);
     }
 
+    auto func_ = (void (*)(uint64_t, uint64_t, int32_t, int32_t, uint64_t, uint64_t, int32_t, int32_t, int32_t, int32_t, uint8_t*, float*, uint64_t, uint64_t, const char*))dlsym(dlHandle_, "Kernel");
 
-    // if(src_format == "BGR") {
-      auto func_ = (void (*)(uint64_t, uint64_t, int32_t, int32_t, uint64_t, uint64_t, int32_t, int32_t, int32_t, int32_t, int16_t*, int16_t*, int32_t*, int32_t*, uint8_t*, float*, uint64_t, uint64_t))dlsym(dlHandle_, "BGR_Kernel");
-    //}
-    
     if (!func_) {
         std::cout << "Target function not found";
         exit(1);
     }
 
+    // extract dynamic runtime args
     int resize_h = resize_hw[0];
     int resize_w = resize_hw[1];
 
@@ -124,28 +125,37 @@ class FuseTransformKernel : public ::mmdeploy::FuseTransformKernel {
     int pad_w = padding_size_hw[1];
 
 
-    // call kernel
-    short* cubfh; 
-    short* cubfw;
-    int* inth;
-    int* intw;
+    std::string format;
+    switch (src_pft)
+    {
+      case PixelFormat::kBGR:
+        format = "BGR";
+        break;
+      case PixelFormat::kRGB:
+        format = "RGB";
+        break;
+      case PixelFormat::kGRAYSCALE:
+        format = "GRAY";
+        break;
+      case PixelFormat::kBGRA:
+        format = "BGRA";
+        break;
+      case PixelFormat::kNV12:
+        format = "NV12";
+        break;
+      case PixelFormat::kNV21:
+        format = "NV21";
+        break;
+      default: {
+        std::cout << "Unable to recognize the src format";
+        exit(1);
+        break;
+      }
+    } 
 
     auto t0 = std::chrono::high_resolution_clock::now();
-    if(resize_h && resize_w ) { // add bilinear judegement
-      cubfh = new short[resize_h*2];
-      cubfw = new short[resize_w*2];
-      inth = new int[resize_h*2];
-      intw = new int[resize_w*2];
-
-      resize_preprocess(src_h, src_w, resize_h, resize_w, cubfh, cubfw, inth, intw);
-    }
-
-    func_(resize_h, resize_w, crop_top, crop_left, pad_h, pad_w, padding_tlbr[0], padding_tlbr[1], padding_tlbr[2], padding_tlbr[3], cubfh, cubfw, inth, intw, src_raw_data, dst_raw_data, src_h, src_w); //dynamic
-
-    delete[] cubfh;
-    delete[] cubfw;
-    delete[] inth;
-    delete[] intw;
+    // call kernel
+    func_(resize_h, resize_w, crop_top, crop_left, pad_h, pad_w, padding_tlbr[0], padding_tlbr[1], padding_tlbr[2], padding_tlbr[3], src_raw_data, dst_raw_data, src_h, src_w, format.c_str()); //dynamic
 
     auto t1 = std::chrono::high_resolution_clock::now();
     MMDEPLOY_INFO("elena fused time, cost: {}ms",
