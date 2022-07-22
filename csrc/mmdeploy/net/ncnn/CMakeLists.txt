@@ -10,6 +10,7 @@ if ("cpu" IN_LIST MMDEPLOY_TARGET_DEVICES)
     target_link_libraries(${PROJECT_NAME} PRIVATE mmdeploy_ncnn_ops_obj)
     target_link_libraries(${PROJECT_NAME} PRIVATE ncnn)
     add_library(mmdeploy::ncnn_net ALIAS ${PROJECT_NAME})
+    set(GLOBAL_OBJ ${GLOBAL_OBJ} mmdeploy_ncnn_ops_obj CACHE INTERNAL "")
 else ()
     message(
             ERROR

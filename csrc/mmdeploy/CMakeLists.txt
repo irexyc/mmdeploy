@@ -22,15 +22,5 @@ if (MMDEPLOY_BUILD_SDK)
     add_subdirectory(apis/c/mmdeploy)
 
     # all-in-one library
-    if (MMDEPLOY_MONOLITHIC)
-        add_library(mmdeploy ${MMDEPLOY_LIB_TYPE})
-        target_link_libraries(mmdeploy PRIVATE ${GLOBAL_OBJ})
-        target_include_directories(mmdeploy PUBLIC
-            $<INSTALL_INTERFACE:include>)
-        set_target_properties(mmdeploy PROPERTIES
-            VERSION ${PROJECT_VERSION}
-            SOVERSION ${PROJECT_VERSION_MAJOR})
-        target_link_libraries(MMDeployLibs INTERFACE mmdeploy)
-        mmdeploy_export(mmdeploy)
-    endif ()
+    add_subdirectory(monolithic)
 endif ()

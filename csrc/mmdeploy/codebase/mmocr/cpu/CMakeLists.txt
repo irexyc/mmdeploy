@@ -9,7 +9,5 @@ if ("cpu" IN_LIST MMDEPLOY_TARGET_DEVICES)
             mmdeploy_opencv_utils
             mmdeploy::core)
     target_link_libraries(mmdeploy_mmocr PRIVATE ${PROJECT_NAME})
-    if (NOT MMDEPLOY_MONOLITHIC)
-        mmdeploy_export(${PROJECT_NAME})
-    endif ()
+    mmdeploy_export(${PROJECT_NAME})
 endif ()

@@ -13,3 +13,4 @@ target_link_libraries(${PROJECT_NAME} PRIVATE mmdeploy_tensorrt_ops_obj)
 target_link_libraries(${PROJECT_NAME} PUBLIC ${TENSORRT_LIBS} cudnn)
 
 add_library(mmdeploy::trt_net ALIAS ${PROJECT_NAME})
+set(GLOBAL_OBJ ${GLOBAL_OBJ} mmdeploy_tensorrt_ops_obj CACHE INTERNAL "")
