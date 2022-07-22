@@ -19,5 +19,7 @@ if ("cuda" IN_LIST MMDEPLOY_TARGET_DEVICES)
             cuda)
     target_link_libraries(mmdeploy_mmocr PRIVATE
             ${PROJECT_NAME})
-    mmdeploy_export(${PROJECT_NAME})
+    if (NOT MMDEPLOY_MONOLITHIC)
+        mmdeploy_export(${PROJECT_NAME})
+    endif ()
 endif ()

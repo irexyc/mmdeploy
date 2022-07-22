@@ -5,7 +5,7 @@ project(mmdeploy-example)
 find_package(MMDeploy REQUIRED)
 
 function(add_example task name)
-  if (TARGET mmdeploy_${task})
+  if (${task} IN_LIST MMDEPLOY_TASKS)
     # Search for c/cpp sources
     file(GLOB _SRCS ${name}.c*)
     add_executable(${name} ${_SRCS})
