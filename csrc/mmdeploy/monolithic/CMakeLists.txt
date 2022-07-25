@@ -9,13 +9,20 @@ add_library(mmdeploy ${MMDEPLOY_LIB_TYPE})
 target_link_libraries(mmdeploy PRIVATE ${GLOBAL_OBJ})
 target_include_directories(mmdeploy PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../apis/c>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../>
     $<INSTALL_INTERFACE:include>)
 set_target_properties(mmdeploy PROPERTIES
     VERSION ${PROJECT_VERSION}
     SOVERSION ${PROJECT_VERSION_MAJOR})
 
 target_link_libraries(MMDeployLibs INTERFACE mmdeploy)
+
 if (NOT MMDEPLOY_SHARED_LIBS)
-    target_link_libraries(MMDeployStaticModules INTERFACE mmdeploy)
+    if (MSVC)
+        target_link_options(mmdeploy INTERFACE "/WHOLEARCHIVE:mmdeploy")
+    else ()
+        target_link_libraries(MMDeployStaticModules INTERFACE mmdeploy)
+    endif ()
 endif ()
+
 mmdeploy_export(mmdeploy)
