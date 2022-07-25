@@ -338,6 +338,12 @@ Currently, <b>The Model Converter supports torchscript, but SDK doesn't</b>.
     <td>ON</td>
     <td>Switch to build shared library or static library of MMDeploy SDK</td>
   </tr>
+  <tr>
+    <td>MMDEPLOY_MONOLITHIC</td>
+    <td>{ON, OFF}</td>
+    <td>OFF</td>
+    <td>Whether to build single MMDeploy SDK library.</td>
+  </tr>
 </tbody>
 </table>
 

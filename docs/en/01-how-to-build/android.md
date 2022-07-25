@@ -166,6 +166,12 @@ make install
     <td>ON</td>
     <td>Switch to build shared library or static library of MMDeploy SDK. Now you should build static library for android. Bug will be fixed soon.</td>
   </tr>
+  <tr>
+    <td>MMDEPLOY_MONOLITHIC</td>
+    <td>{ON, OFF}</td>
+    <td>OFF</td>
+    <td>Whether to build single MMDeploy SDK library.</td>
+  </tr>
 </tbody>
 </table>
 

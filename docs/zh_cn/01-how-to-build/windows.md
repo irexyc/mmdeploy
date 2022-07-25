@@ -262,6 +262,12 @@ $env:MMDEPLOY_DIR="$pwd"
     <td>ON</td>
     <td>动态库的编译开关。设置OFF时，编译静态库</td>
   </tr>
+  <tr>
+    <td>MMDEPLOY_MONOLITHIC</td>
+    <td>{ON, OFF}</td>
+    <td>OFF</td>
+    <td>MMDeploy SDK 是否编译为一个单一的库文件.</td>
+  </tr>
 </tbody>
 </table>
 

@@ -334,6 +334,12 @@ export MMDEPLOY_DIR=$(pwd)
     <td>ON</td>
     <td>MMDeploy SDK 的动态库的编译开关。设置 OFF 时，编译静态库</td>
   </tr>
+  <tr>
+    <td>MMDEPLOY_MONOLITHIC</td>
+    <td>{ON, OFF}</td>
+    <td>OFF</td>
+    <td>MMDeploy SDK 是否编译为一个单一的库文件.</td>
+  </tr>
 </tbody>
 </table>
 
