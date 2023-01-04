@@ -1,9 +1,9 @@
 name: prebuild-package
 
-on:
-  push:
-    tags:
-      - "v*"
+# on:
+#   push:
+#     tags:
+#       - "v*"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -17,12 +17,17 @@ jobs:
     steps:
       - name: Install Conda
         uses: conda-incubator/setup-miniconda@v2
+      - name: Install python
         run: |
           conda create -n mmdeploy-3.6 python=3.6
           conda create -n mmdeploy-3.7 python=3.7
       - name: Check
         run: |
           conda env list
+          conda activate mmdeploy-3.6
+          conda list
+          conda activate mmdeploy-3.7
+          conda list
       - name: Checkout repository
         uses: actions/checkout@v3
         with:
