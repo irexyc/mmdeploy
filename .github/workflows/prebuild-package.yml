@@ -2,8 +2,6 @@ name: prebuild-package
 
 on:
   push:
-    branches:
-      - "**"
     tags:
       - "v*"
 
