@@ -15,6 +15,14 @@ jobs:
   windows-prebuild-package:
     runs-on: windows-latest
     steps:
+      - name: Install Conda
+        uses: conda-incubator/setup-miniconda@v2
+        run: |
+          conda create -n mmdeploy-3.6 python=3.6
+          conda create -n mmdeploy-3.7 python=3.7
+      - name: Check
+        run: |
+          conda env list
       - name: Checkout repository
         uses: actions/checkout@v3
         with:
