@@ -16,7 +16,7 @@ concurrency:
 permissions: write-all
 
 jobs:
-  windows-prebuild-package:
+  windows-prebuild-package-onnxruntime:
     runs-on: windows-latest
     steps:
       - name: Install Conda
@@ -25,13 +25,8 @@ jobs:
         run: |
           conda create -n mmdeploy-3.6 python=3.6
           conda create -n mmdeploy-3.7 python=3.7
-      - name: Check
-        run: |
-          conda env list
-          conda activate mmdeploy-3.6
-          conda list
-          conda activate mmdeploy-3.7
-          conda list
+          conda create -n mmdeploy-3.8 python=3.8
+          conda create -n mmdeploy-3.9 python=3.9
       - name: Checkout repository
         uses: actions/checkout@v3
         with:
