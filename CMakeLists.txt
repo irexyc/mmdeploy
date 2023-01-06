@@ -4,6 +4,7 @@ if (NOT DEFINED CMAKE_INSTALL_PREFIX)
 endif ()
 message(STATUS "CMAKE_INSTALL_PREFIX: ${CMAKE_INSTALL_PREFIX}")
 
+
 cmake_minimum_required(VERSION 3.14)
 project(MMDeploy VERSION 0.11.0)
 
