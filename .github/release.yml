@@ -20,13 +20,3 @@ changelog:
     - title: 🌐 Other
       labels:
         - '*'
-      exclude:
-        labels:
-          - feature
-          - enhancement
-          - bug
-          - documentation
-          - Bug:P0
-          - Bug:P1
-          - Bug:P2
-          - Bug:P3
