@@ -6,7 +6,7 @@ aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR} OCR_SRCS)
 aux_source_directory(${CMAKE_SOURCE_DIR}/third_party/clipper CLIPPER_SRCS)
 set(SRCS ${OCR_SRCS} ${CLIPPER_SRCS})
 
-mmdeploy_add_module(${PROJECT_NAME} "${SRCS}")
+mmdeploy_add_module(${PROJECT_NAME} LIBRARY "${SRCS}")
 
 add_subdirectory(cpu)
 add_subdirectory(cuda)

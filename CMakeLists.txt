@@ -81,6 +81,7 @@ endif()
 
 add_library(MMDeployStaticModules INTERFACE)
 add_library(MMDeployDynamicModules INTERFACE)
+add_library(MMDeployOptionalModules INTERFACE)
 add_library(MMDeployLibs INTERFACE)
 
 if ((cuda IN_LIST MMDEPLOY_TARGET_DEVICES) OR (trt IN_LIST MMDEPLOY_TARGET_BACKENDS))

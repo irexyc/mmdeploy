@@ -44,7 +44,8 @@ endfunction ()
 function (mmdeploy_add_module NAME)
     # EXCLUDE: exclude from registering & exporting as SDK module
     # LIBRARY: the module is also a library (add_libray with SHARED instead of MODULE)
-    cmake_parse_arguments(_MMDEPLOY "EXCLUDE;LIBRARY" "" "" ${ARGN})
+    # OPTIONAL: the module used by dlopen
+    cmake_parse_arguments(_MMDEPLOY "EXCLUDE;LIBRARY;OPTIONAL" "" "" ${ARGN})
     # search for add_library keywords
     cmake_parse_arguments(_TYPE "STATIC;SHARED;MODULE" "" "" ${_MMDEPLOY_UNPARSED_ARGUMENTS})
 
@@ -90,6 +91,10 @@ function (mmdeploy_add_module NAME)
         # register dynamic modules
         if (NOT _MMDEPLOY_EXCLUDE)
             target_link_libraries(MMDeployDynamicModules INTERFACE ${NAME})
+        endif ()
+        # register optional modules
+        if (_MMDEPLOY_OPTIONAL)
+            target_link_libraries(MMDeployOptionalModules INTERFACE ${NAME})
         endif ()
     else ()
         message(FATAL_ERROR "unsupported type: ${_TYPE}")

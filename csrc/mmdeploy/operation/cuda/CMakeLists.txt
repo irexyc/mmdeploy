@@ -23,7 +23,7 @@ set(SRCS resize.cpp
         permute.cpp
         permute.cu)
 
-mmdeploy_add_module(${PROJECT_NAME} "${SRCS}")
+mmdeploy_add_module(${PROJECT_NAME} EXCLUDE OPTIONAL MODULE "${SRCS}")
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
         mmdeploy_operation
