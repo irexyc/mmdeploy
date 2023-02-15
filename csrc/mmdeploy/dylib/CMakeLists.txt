@@ -3,6 +3,7 @@
 project(mmdeploy_dylib)
 
 set(SRCS dylib.cpp)
+set(DLLIB)
 
 if (WIN32)
     list(APPEND SRCS
@@ -12,6 +13,7 @@ else ()
     list(APPEND SRCS
         ${CMAKE_CURRENT_SOURCE_DIR}/posix/dylib.cpp
     )
+    set(DLLIB "dl")
 endif ()
 
 _mmdeploy_flatten_modules(_MODEL_LIST MMDeployOptionalModules)
@@ -24,5 +26,4 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/config.h.in
     ${CMAKE_CURRENT_SOURCE_DIR}/config.h)
 
 mmdeploy_add_module(${PROJECT_NAME} ${SRCS})
-target_link_libraries(${PROJECT_NAME} PUBLIC dl)
-add_library(mmdeploy::dylib ALIAS ${PROJECT_NAME})
+target_link_libraries(${PROJECT_NAME} PUBLIC ${DLLIB})

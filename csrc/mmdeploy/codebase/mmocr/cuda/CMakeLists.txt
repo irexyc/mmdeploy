@@ -18,6 +18,7 @@ if ("cuda" IN_LIST MMDEPLOY_TARGET_DEVICES)
         mmdeploy_opencv_utils
         mmdeploy::core
         ${CUDA_LIBRARIES}
-        cuda)
+        cuda
+        mmdeploy_mmocr)
     mmdeploy_export(${PROJECT_NAME})
 endif ()

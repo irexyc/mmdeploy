@@ -7,7 +7,7 @@
 #include <string>
 
 #ifdef _WIN32
-#define LIBPREFIX
+#define LIBPREFIX ""
 #define LIBSUFFIX ".dll"
 #elif defined(__APPLE__)
 #define LIBPREFIX "lib"
