@@ -6,10 +6,8 @@ name: prebuild-package
 #       - "v*"
 on:
   push:
-    branches:
-      - "**"
     tags:
-      - "v**"
+      - 'v**'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
