@@ -33,10 +33,10 @@ jobs:
           submodules: 'recursive'
       - name: Build
         run: |
-          Compress-Archive -Path . -DestinationPath win.zip
+          Compress-Archive -Path ./mmdeploy/csrc -DestinationPath win.zip
       - name: Release
         uses: softprops/action-gh-release@v1
-        if: startsWith(github.ref, 'refs/tags/')
+        if: startsWith(github.ref, 'refs/tags/v')
         with:
           files: |
             win.zip
