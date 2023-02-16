@@ -19,21 +19,21 @@ jobs:
   windows-prebuild-package-onnxruntime:
     runs-on: windows-latest
     steps:
-      - name: Install Conda
-        uses: conda-incubator/setup-miniconda@v2
-      - name: Install python
-        run: |
-          conda create -n mmdeploy-3.6 python=3.6
-          conda create -n mmdeploy-3.7 python=3.7
-          conda create -n mmdeploy-3.8 python=3.8
-          conda create -n mmdeploy-3.9 python=3.9
+      # - name: Install Conda
+      #   uses: conda-incubator/setup-miniconda@v2
+      # - name: Install python
+      #   run: |
+      #     conda create -n mmdeploy-3.6 python=3.6
+      #     conda create -n mmdeploy-3.7 python=3.7
+      #     conda create -n mmdeploy-3.8 python=3.8
+      #     conda create -n mmdeploy-3.9 python=3.9
       - name: Checkout repository
         uses: actions/checkout@v3
         with:
           submodules: 'recursive'
       - name: Build
         run: |
-          Compress-Archive -Path ./mmdeploy/csrc -DestinationPath win.zip
+          Compress-Archive -Path mmdeploy/csrc -DestinationPath win.zip
       - name: Release
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/v')
