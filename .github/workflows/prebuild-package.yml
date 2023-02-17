@@ -45,5 +45,5 @@ jobs:
     container: nvidia/cuda:11.3.0-cudnn8-devel-ubuntu20.04
     steps:
       -name: Echo
-        run: |
-          echo "hello"
+       run: |
+         echo "hello"
