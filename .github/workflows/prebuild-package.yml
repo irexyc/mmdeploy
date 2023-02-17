@@ -49,6 +49,7 @@ jobs:
           echo "hello"
       - name: DABAO
         run: |
+          touch mmdeploy
           tar cf mmdeploy.tar.gz mmdeploy
       - name: Release
         uses: softprops/action-gh-release@v1
