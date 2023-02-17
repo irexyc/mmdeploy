@@ -1,5 +1,7 @@
 name: prebuild-package
 
+# choice boolean environment
+
 on:
   push:
     tags:
@@ -21,7 +23,7 @@ on:
         type: boolean
       environment:
         description: 'Environment to run tests against'
-        type: environment
+        type: string
         required: true
 
 concurrency:
