@@ -8,24 +8,26 @@ on:
       - 'v**'
   workflow_dispatch:
     inputs:
-      on-win10:
-        description: 'Buidl on windows10'
+      build-on-win10:
+        description: 'Build on Windows 10'
         required: true
         type: boolean
         default: true
-      logLevel:
-        description: 'Log level'
+      build-on-ubuntu-20-04:
         required: true
-        default: 'warning'
-        type: choice
-        options:
-        - info
-        - warning
-        - debug
-      tags:
-        description: 'Test scenario tags'
-        required: false
+        description: 'Build on Ubuntu 20.04'
         type: boolean
+        default: true
+      target-backends-cpu:
+        description: 'Target backends for cpu'
+        type: string
+        required: true
+        default: "ort;openvino;ncnn"
+      target-backends-gpu:
+        description: 'Target backends for gpu'
+        type: string
+        required: true
+        default: "ort;trt;ncnn"
       environment:
         description: 'Environment to run tests against'
         type: string
