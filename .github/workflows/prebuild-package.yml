@@ -18,20 +18,26 @@ on:
         description: 'Build on Ubuntu 20.04'
         type: boolean
         default: true
+      target-device-cpu:
+        required: true
+        description: 'Build for cpu device'
+        type: boolean
+        default: true
       target-backends-cpu:
         description: 'Target backends for cpu'
         type: string
         required: true
         default: "ort;openvino;ncnn"
-      target-backends-gpu:
-        description: 'Target backends for gpu'
+      target-device-cuda:
+        required: true
+        description: 'Build for cuda device'
+        type: boolean
+        default: true
+      target-backends-cuda:
+        description: 'Target backends for cuda'
         type: string
         required: true
         default: "ort;trt;ncnn"
-      environment:
-        description: 'Environment to run tests against'
-        type: string
-        required: true
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
