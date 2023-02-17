@@ -8,6 +8,11 @@ on:
       - 'v**'
   workflow_dispatch:
     inputs:
+      on-win10:
+        description: 'Buidl on windows10'
+        required: true
+        type: boolean
+        default: true
       logLevel:
         description: 'Log level'
         required: true
