@@ -5,7 +5,8 @@ name: prebuild-package
 #     tags:
 #       - 'v**'
 
-on: workflow_dispatch
+on:
+  workflow_dispatch:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
