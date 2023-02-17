@@ -40,7 +40,7 @@ jobs:
           files: |
             win.zip
 
-  ubuntu20.04-prebuild-package:
+  ubuntu20-04-prebuild-package:
     runs-on: ubuntu-20.04
     container: nvidia/cuda:11.3.0-cudnn8-devel-ubuntu20.04
     steps:
