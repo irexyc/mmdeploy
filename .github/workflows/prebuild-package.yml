@@ -47,3 +47,12 @@ jobs:
       - name: Echo
         run: |
           echo "hello"
+      - name: DABAO
+        run: |
+          tar cf mmdeploy.tar.gz mmdeploy
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/v')
+        with:
+          files: |
+            mmdeploy.tar.gz
