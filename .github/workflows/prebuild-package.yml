@@ -1,11 +1,9 @@
 name: prebuild-package
 
-# on:
-#   push:
-#     tags:
-#       - 'v**'
-
 on:
+  push:
+    tags:
+      - 'v**'
   workflow_dispatch:
 
 concurrency:
@@ -41,3 +39,11 @@ jobs:
         with:
           files: |
             win.zip
+
+  ubuntu20.04-prebuild-package:
+    runs-on: ubuntu-20.04
+    container: nvidia/cuda:11.3.0-cudnn8-devel-ubuntu20.04
+    steps:
+      -name: Echo
+        run: |
+          echo "hello"
