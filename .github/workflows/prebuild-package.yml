@@ -63,6 +63,7 @@ jobs:
           cmake --build . --config Release -j
           cmake --install . --config Release
       - name: Archive
+        run: |
           Compress-Archive -Path opencv\build\install -DestinationPath win.zip
       # - name: Install Conda
       #   uses: conda-incubator/setup-miniconda@v2
