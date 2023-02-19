@@ -68,14 +68,12 @@ jobs:
       #       -DBUILD_opencv_java=OFF -DBUILD_opencv_python2=OFF -DBUILD_opencv_python3=OFF
       #     cmake --build . --config Release -j
       #     cmake --install . --config Release
-      - name: Checkout repository
-        uses: actions/checkout@v3
-        with:
-          submodules: 'recursive'
-      - name: DIR
+      - name: DIR1
         run: |
-          pwd
           ls
+      - name: DIR2
+        run: |
+          ls ..
       # - name: Install Conda
       #   uses: conda-incubator/setup-miniconda@v2
       # - name: Install python
