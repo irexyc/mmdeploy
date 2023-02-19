@@ -15,7 +15,7 @@ on:
         default: true
       build-on-ubuntu-20-04:
         required: true
-        description: 'Build on Ubuntu 20.04'
+        description: 'Build on Ubuntu 18.04'
         type: boolean
         default: true
       target-device-cpu:
@@ -48,7 +48,11 @@ permissions: write-all
 jobs:
   windows-10-cpu:
     runs-on: windows-latest
+    if: (github.event.inputs.build-on-win10) == 'true' && (github.event.inputs.target-backends-cpu != '')
     steps:
+      - name: Install OpenCV
+        run: |
+          dir
       # - name: Install Conda
       #   uses: conda-incubator/setup-miniconda@v2
       # - name: Install python
@@ -73,20 +77,28 @@ jobs:
           files: |
             win.zip
 
-  ubuntu20-04-prebuild-package:
-    runs-on: ubuntu-20.04
-    container: nvidia/cuda:11.3.0-cudnn8-devel-ubuntu20.04
-    steps:
-      - name: Echo
-        run: |
-          echo "hello"
-      - name: DABAO
-        run: |
-          touch mmdeploy
-          tar cf mmdeploy.tar.gz mmdeploy
-      - name: Release
-        uses: softprops/action-gh-release@v1
-        if: startsWith(github.ref, 'refs/tags/v')
-        with:
-          files: |
-            mmdeploy.tar.gz
+  # windows-10-cuda:
+  #   runs-on: windows-latest
+  #   steps:
+  #     - name: Checkout repository
+  #       uses: actions/checkout@v3
+  #       with:
+  #         submodules: 'recursive'
+
+  # ubuntu20-04-prebuild-package:
+  #   runs-on: ubuntu-18.04
+  #   container: nvidia/cuda:11.3.0-cudnn8-devel-ubuntu18.04
+  #   steps:
+  #     - name: Echo
+  #       run: |
+  #         echo "hello"
+  #     - name: DABAO
+  #       run: |
+  #         touch mmdeploy
+  #         tar cf mmdeploy.tar.gz mmdeploy
+  #     - name: Release
+  #       uses: softprops/action-gh-release@v1
+  #       if: startsWith(github.ref, 'refs/tags/v')
+  #       with:
+  #         files: |
+  #           mmdeploy.tar.gz
