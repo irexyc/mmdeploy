@@ -38,6 +38,21 @@ on:
         type: string
         required: false
         default: '1.8.1'
+      ncnn-ver:
+        description: 'ncnn version'
+        type: string
+        required: false
+        default: '20221128'
+      openvino-ver:
+        description: 'OpenVINO version'
+        type: string
+        required: false
+        default: '2022.2'
+      tensorrt-ver:
+        description: 'TensorRT version'
+        type: string
+        required: false
+        default: '8.2.3.0'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -90,10 +105,6 @@ jobs:
           conda activate mmdeploy-3.6
           pip install pyyaml packaging
           mkdir packing; cd packing
-          python ../tools/package_tools/mmdeploy_builder.py ../tools/package_tools/configs/windows_x64-cpu.yaml ../
-      - name: Build
-        run: |
-          mkdir packing
           python ../tools/package_tools/mmdeploy_builder.py ../tools/package_tools/configs/windows_x64-cpu.yaml ../
           $pkg = $(ls).Name
           Compress-Archive -Path $pkg -DestinationPath "$pkg.zip"
