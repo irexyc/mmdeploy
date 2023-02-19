@@ -52,7 +52,8 @@ jobs:
     steps:
       - name: Install OpenCV
         run: |
-          dir
+          echo ${{ github.event.inputs.build-on-win10 }}
+          echo ${{ github.event.inputs.target-backends-cpu }}
       # - name: Install Conda
       #   uses: conda-incubator/setup-miniconda@v2
       # - name: Install python
@@ -61,21 +62,21 @@ jobs:
       #     conda create -n mmdeploy-3.7 python=3.7
       #     conda create -n mmdeploy-3.8 python=3.8
       #     conda create -n mmdeploy-3.9 python=3.9
-      - name: Checkout repository
-        uses: actions/checkout@v3
-        with:
-          submodules: 'recursive'
-      - name: Build
-        run: |
-          ls
-          Compress-Archive -Path csrc -DestinationPath win.zip
-          ls
-      - name: Release
-        uses: softprops/action-gh-release@v1
-        if: startsWith(github.ref, 'refs/tags/v')
-        with:
-          files: |
-            win.zip
+      # - name: Checkout repository
+      #   uses: actions/checkout@v3
+      #   with:
+      #     submodules: 'recursive'
+      # - name: Build
+      #   run: |
+      #     ls
+      #     Compress-Archive -Path csrc -DestinationPath win.zip
+      #     ls
+      # - name: Release
+      #   uses: softprops/action-gh-release@v1
+      #   if: startsWith(github.ref, 'refs/tags/v')
+      #   with:
+      #     files: |
+      #       win.zip
 
   # windows-10-cuda:
   #   runs-on: windows-latest
