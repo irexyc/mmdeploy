@@ -21,12 +21,12 @@ on:
       target-backends-cpu:
         description: 'Target backends for cpu (none to skip)'
         type: string
-        required: true
+        required: false
         default: 'ort;openvino;ncnn'
       target-backends-cuda:
         description: 'Target backends for cuda (none to skip)'
         type: string
-        required: true
+        required: false
         default: 'ort;trt;ncnn'
       opencv-ver:
         description: 'OpenCV version'
@@ -93,14 +93,14 @@ jobs:
       #     python ../tools/package_tools/mmdeploy_builder.py ../tools/package_tools/configs/windows_x64-cpu.yaml ../
       - name: Build
         run: |
-          echo 'abc' > 1.txt
-          echo "upload=1.txt" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          mkdir packing
+          echo 'abc' > packing/1.txt
       - name: Release
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/v')
         with:
           files: |
-            $upload
+            packing/*
 
 
   # windows-10-cuda:
