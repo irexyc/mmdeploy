@@ -73,30 +73,34 @@ jobs:
       #     Expand-Archive "$out.zip" $out
       #     $ONNXRUNTIME_DIR = [IO.Path]::Combine("$pwd", "$out", "$(ls $out)")
       #     echo "ONNXRUNTIME_DIR=$ONNXRUNTIME_DIR" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-      - name: Install Conda
-        uses: conda-incubator/setup-miniconda@v2
-      - name: Install python
-        run: |
-          conda create -n mmdeploy-3.6 python=3.6
-          conda create -n mmdeploy-3.7 python=3.7
-          conda create -n mmdeploy-3.8 python=3.8
-          conda create -n mmdeploy-3.9 python=3.9
-      - name: Checkout repository
-        uses: actions/checkout@v3
-        with:
-          submodules: 'recursive'
+      # - name: Install Conda
+      #   uses: conda-incubator/setup-miniconda@v2
+      # - name: Install python
+      #   run: |
+      #     conda create -n mmdeploy-3.6 python=3.6
+      #     conda create -n mmdeploy-3.7 python=3.7
+      #     conda create -n mmdeploy-3.8 python=3.8
+      #     conda create -n mmdeploy-3.9 python=3.9
+      # - name: Checkout repository
+      #   uses: actions/checkout@v3
+      #   with:
+      #     submodules: 'recursive'
+      # - name: Build
+      #   run: |
+      #     conda activate mmdeploy-3.6
+      #     pip install pyyaml packaging
+      #     mkdir packing; cd packing
+      #     python ../tools/package_tools/mmdeploy_builder.py ../tools/package_tools/configs/windows_x64-cpu.yaml ../
       - name: Build
         run: |
-          conda activate mmdeploy-3.6
-          pip install pyyaml packaging
-          mkdir packing; cd packing
-          python ../tools/package_tools/mmdeploy_builder.py ../tools/package_tools/configs/windows_x64-cpu.yaml ../
+          echo 'abc' > 1.txt
+          echo "upload=1.txt" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
       - name: Release
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/v')
         with:
           files: |
-            win.zip
+            $upload
 
 
   # windows-10-cuda:
