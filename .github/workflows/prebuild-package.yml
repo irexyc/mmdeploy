@@ -21,7 +21,7 @@ on:
       target-backends-cpu:
         description: 'Target backends for cpu (none to skip)'
         type: string
-        required: trues
+        required: true
         default: 'ort;openvino;ncnn'
       target-backends-cuda:
         description: 'Target backends for cuda (none to skip)'
