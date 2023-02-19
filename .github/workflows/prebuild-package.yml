@@ -75,15 +75,7 @@ jobs:
 
   ubuntu20-04-prebuild-package:
     runs-on: ubuntu-20.04
-    # container: nvidia/cuda:11.3.0-cudnn8-devel-ubuntu20.04
-    strategy:
-      matrix:
-        include:
-          - val: a
-            run: ${{ github.event.inputs.target-device-cpu }}
-          - val: b
-            run: ${{ github.event.inputs.target-device-cuda }}
-    if: ${{ matrix.run }}
+    container: nvidia/cuda:11.3.0-cudnn8-devel-ubuntu20.04
     steps:
       - name: Echo
         run: |
