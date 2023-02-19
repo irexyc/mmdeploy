@@ -58,16 +58,17 @@ jobs:
       #       -DBUILD_opencv_java=OFF -DBUILD_opencv_python2=OFF -DBUILD_opencv_python3=OFF
       #     cmake --build . --config Release -j
       #     cmake --install . --config Release
-      - name: Install ONNXRuntime
+      - name: Install ONNX Runtime
         working-directory: ..
         run: |
           $onnxruntimeVer = ${{ github.event.inputs.onnxruntime-ver }}
           $url = "https://github.com/microsoft/onnxruntime/releases/download/v$onnxruntimeVer/onnxruntime-win-x64-$onnxruntimeVer.zip"
           $out = "onnxruntime"
-          Invoke-WebRequest -Uri $url -OutFile "$out.zip"
-          Expand-Archive "$out.zip" $out
-          $ONNXRUNTIME_DIR = [IO.Path]::Combine("$pwd", "$out", "$(ls $out).Name")
-          echo "ONNXRUNTIME_DIR=$ONNXRUNTIME_DIR" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          echo $url
+          # Invoke-WebRequest -Uri $url -OutFile "$out.zip"
+          # Expand-Archive "$out.zip" $out
+          # $ONNXRUNTIME_DIR = [IO.Path]::Combine("$pwd", "$out", "$(ls $out).Name")
+          # echo "ONNXRUNTIME_DIR=$ONNXRUNTIME_DIR" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
       - name: CHECK
         run: |
           dir env:
