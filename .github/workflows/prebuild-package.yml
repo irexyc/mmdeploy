@@ -18,21 +18,11 @@ on:
         description: 'Build on Ubuntu 18.04'
         type: boolean
         default: true
-      # target-device-cpu:
-      #   required: true
-      #   description: 'Build for cpu device'
-      #   type: boolean
-      #   default: true
       target-backends-cpu:
         description: 'Target backends for cpu (none to skip)'
         type: string
         required: false
         default: 'ort;openvino;ncnn'
-      # target-device-cuda:
-      #   required: true
-      #   description: 'Build for cuda device'
-      #   type: boolean
-      #   default: true
       target-backends-cuda:
         description: 'Target backends for cuda (none to skip)'
         type: string
@@ -68,12 +58,14 @@ jobs:
       #       -DBUILD_opencv_java=OFF -DBUILD_opencv_python2=OFF -DBUILD_opencv_python3=OFF
       #     cmake --build . --config Release -j
       #     cmake --install . --config Release
-      - name: DIR1
+      - name: Install ONNXRuntime
+        working-directory: ./temp
         run: |
-          ls
-      - name: DIR2
-        run: |
-          ls ..
+          pwd
+          $onnxruntimeVer = github.event.inputs.onnxruntime-ver
+          $url = 'https://github.com/microsoft/onnxruntime/releases/download/v$onnxruntimeVer/onnxruntime-win-x64-$onnxruntimeVer.zip'
+          echo $url
+
       # - name: Install Conda
       #   uses: conda-incubator/setup-miniconda@v2
       # - name: Install python
