@@ -48,7 +48,7 @@ permissions: write-all
 jobs:
   windows-10-cpu:
     runs-on: windows-latest
-    if: (github.event.inputs.build-on-win10) == 'true' && (github.event.inputs.target-backends-cpu != '')
+    if: (github.event.inputs.build-on-win10 == 'true') && (github.event.inputs.target-backends-cpu != '')
     steps:
       - name: Install OpenCV
         run: |
