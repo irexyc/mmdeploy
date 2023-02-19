@@ -55,16 +55,19 @@ jobs:
     runs-on: windows-latest
     if: (github.event.inputs.build-on-win10 == 'true') && (github.event.inputs.target-backends-cpu != 'none')
     steps:
-      - name: Install OpenCV
+      # - name: Install OpenCV
+      #   run: |
+      #     git clone -b ${{ github.event.inputs.opencv-ver}} --depth=1 https://github.com/opencv/opencv.git
+      #     cd opencv; mkdir build; cd build
+      #     cmake .. -A x64 -T v142 -DBUILD_TESTS=OFF -DBUILD_PERF_TESTS=OFF -DBUILD_SHARED_LIBS=OFF -DBUILD_JAVA=OFF `
+      #       -DBUILD_opencv_java=OFF -DBUILD_opencv_python2=OFF -DBUILD_opencv_python3=OFF
+      #     cmake --build . --config Release -j
+      #     cmake --install . --config Release
+      - name: DIR
         run: |
-          git clone -b ${{ github.event.inputs.opencv-ver}} --depth=1 https://github.com/opencv/opencv.git
-          cd opencv; mkdir build; cd build
-          cmake .. -A x64 -T v142 -DBUILD_TESTS=OFF -DBUILD_PERF_TESTS=OFF -DBUILD_SHARED_LIBS=OFF
-          cmake --build . --config Release -j
-          cmake --install . --config Release
-      - name: Archive
-        run: |
-          Compress-Archive -Path opencv\build\install -DestinationPath win.zip
+          pwd
+          dir
+          dir ..
       # - name: Install Conda
       #   uses: conda-incubator/setup-miniconda@v2
       # - name: Install python
