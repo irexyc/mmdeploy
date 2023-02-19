@@ -27,7 +27,7 @@ on:
         description: 'Target backends for cpu'
         type: string
         required: false
-        default: "ort;openvino;ncnn"
+        default: 'ort;openvino;ncnn'
       # target-device-cuda:
       #   required: true
       #   description: 'Build for cuda device'
@@ -37,7 +37,7 @@ on:
         description: 'Target backends for cuda'
         type: string
         required: false
-        default: "ort;trt;ncnn"
+        default: 'ort;trt;ncnn'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
