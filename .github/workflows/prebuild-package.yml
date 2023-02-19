@@ -59,7 +59,7 @@ jobs:
       #     cmake --build . --config Release -j
       #     cmake --install . --config Release
       - name: Install ONNXRuntime
-        working-directory: ./temp
+        working-directory: ..
         run: |
           pwd
           $onnxruntimeVer = github.event.inputs.onnxruntime-ver
