@@ -24,7 +24,7 @@ on:
       #   type: boolean
       #   default: true
       target-backends-cpu:
-        description: 'Target backends for cpu'
+        description: 'Target backends for cpu (none to skip)'
         type: string
         required: false
         default: 'ort;openvino;ncnn'
@@ -34,10 +34,15 @@ on:
       #   type: boolean
       #   default: true
       target-backends-cuda:
-        description: 'Target backends for cuda'
+        description: 'Target backends for cuda (none to skip)'
         type: string
         required: false
         default: 'ort;trt;ncnn'
+      opencv-ver:
+        description: 'OpenCV version'
+        type: string
+        required: false
+        default: '4.5.5'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -52,8 +57,13 @@ jobs:
     steps:
       - name: Install OpenCV
         run: |
-          echo ${{ github.event.inputs.build-on-win10 }}
-          echo ${{ github.event.inputs.target-backends-cpu }}
+          git clone -b ${{ github.event.inputs.opencv-ver}} --depth=1 https://github.com/opencv/opencv.git
+          cd opencv; mkdir build; cd build
+          cmake .. -A x64 -T v142 -DBUILD_TESTS=OFF -DBUILD_PERF_TESTS=OFF -DBUILD_SHARED_LIBS=OFF
+          cmake --build . --config Release -j
+          cmake --install . --config Release
+      - name: Archive
+          Compress-Archive -Path opencv\build\install -DestinationPath win.zip
       # - name: Install Conda
       #   uses: conda-incubator/setup-miniconda@v2
       # - name: Install python
@@ -71,12 +81,12 @@ jobs:
       #     ls
       #     Compress-Archive -Path csrc -DestinationPath win.zip
       #     ls
-      # - name: Release
-      #   uses: softprops/action-gh-release@v1
-      #   if: startsWith(github.ref, 'refs/tags/v')
-      #   with:
-      #     files: |
-      #       win.zip
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/v')
+        with:
+          files: |
+            win.zip
 
   # windows-10-cuda:
   #   runs-on: windows-latest
