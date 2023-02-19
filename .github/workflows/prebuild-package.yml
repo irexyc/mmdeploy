@@ -21,12 +21,12 @@ on:
       target-backends-cpu:
         description: 'Target backends for cpu (none to skip)'
         type: string
-        required: false
+        required: trur
         default: 'ort;openvino;ncnn'
       target-backends-cuda:
         description: 'Target backends for cuda (none to skip)'
         type: string
-        required: false
+        required: true
         default: 'ort;trt;ncnn'
       opencv-ver:
         description: 'OpenCV version'
