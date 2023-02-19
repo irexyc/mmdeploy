@@ -59,7 +59,7 @@ jobs:
             -DBUILD_opencv_java=OFF -DBUILD_opencv_python2=OFF -DBUILD_opencv_python3=OFF
           cmake --build . --config Release -j
           cmake --install . --config Release
-          cd ../install/x64/vc16/staticlib
+          cd install/x64/vc16/staticlib
           $OpenCV_DIR = [IO.Path]::Combine("$pwd")
           echo "OpenCV_DIR=$OpenCV_DIR" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
       - name: Install ONNX Runtime
