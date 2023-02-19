@@ -62,7 +62,7 @@ jobs:
         working-directory: ..
         run: |
           pwd
-          $onnxruntimeVer = github.event.inputs.onnxruntime-ver
+          $onnxruntimeVer = ${{ github.event.inputs.onnxruntime-ver }}
           $url = 'https://github.com/microsoft/onnxruntime/releases/download/v$onnxruntimeVer/onnxruntime-win-x64-$onnxruntimeVer.zip'
           echo $url
 
