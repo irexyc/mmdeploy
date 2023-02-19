@@ -43,6 +43,11 @@ on:
         type: string
         required: false
         default: '4.5.5'
+      onnxruntime-ver:
+        description: 'ONNXRuntime version'
+        type: string
+        required: false
+        default: '1.8.1'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -63,11 +68,13 @@ jobs:
       #       -DBUILD_opencv_java=OFF -DBUILD_opencv_python2=OFF -DBUILD_opencv_python3=OFF
       #     cmake --build . --config Release -j
       #     cmake --install . --config Release
-      - name: DIR
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          submodules: 'recursive'
         run: |
           pwd
-          dir
-          dir ..
+          ls
       # - name: Install Conda
       #   uses: conda-incubator/setup-miniconda@v2
       # - name: Install python
