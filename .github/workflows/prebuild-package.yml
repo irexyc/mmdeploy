@@ -18,25 +18,25 @@ on:
         description: 'Build on Ubuntu 18.04'
         type: boolean
         default: true
-      target-device-cpu:
-        required: true
-        description: 'Build for cpu device'
-        type: boolean
-        default: true
+      # target-device-cpu:
+      #   required: true
+      #   description: 'Build for cpu device'
+      #   type: boolean
+      #   default: true
       target-backends-cpu:
         description: 'Target backends for cpu'
         type: string
-        required: true
+        required: false
         default: "ort;openvino;ncnn"
-      target-device-cuda:
-        required: true
-        description: 'Build for cuda device'
-        type: boolean
-        default: true
+      # target-device-cuda:
+      #   required: true
+      #   description: 'Build for cuda device'
+      #   type: boolean
+      #   default: true
       target-backends-cuda:
         description: 'Target backends for cuda'
         type: string
-        required: true
+        required: false
         default: "ort;trt;ncnn"
 
 concurrency:
