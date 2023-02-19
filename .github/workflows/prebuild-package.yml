@@ -3,9 +3,9 @@ name: prebuild-package
 # ${{ github.event.inputs.message }}
 
 on:
-  push:
-    tags:
-      - 'v**'
+  # push:
+  #   tags:
+  #     - 'v**'
   workflow_dispatch:
     inputs:
       build-on-win10:
@@ -70,8 +70,9 @@ jobs:
         run: |
           git clone -b ${{ github.event.inputs.opencv-ver}} --depth=1 https://github.com/opencv/opencv.git
           cd opencv; mkdir build; cd build
-          cmake .. -A x64 -T v142 -DBUILD_TESTS=OFF -DBUILD_PERF_TESTS=OFF -DBUILD_SHARED_LIBS=OFF -DBUILD_JAVA=OFF `
-            -DBUILD_opencv_java=OFF -DBUILD_opencv_python2=OFF -DBUILD_opencv_python3=OFF
+          cmake .. -A x64 -T v142 -DBUILD_TESTS=OFF -DBUILD_PERF_TESTS=OFF -DBUILD_SHARED_LIBS=OFF `
+            -DBUILD_WITH_STATIC_CRT=OFF -DBUILD_JAVA=OFF -DBUILD_opencv_java=OFF -DBUILD_opencv_python2=OFF `
+            -DBUILD_opencv_python3=OFF
           cmake --build . --config Release -j
           cmake --install . --config Release
           cd install/x64/vc16/staticlib
