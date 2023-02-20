@@ -28,41 +28,53 @@ on:
         type: string
         required: false
         default: 'ort;trt;ncnn'
-      opencv-ver:
-        description: 'ppl.cv version'
+      ver-info:
+        description: 'Version setting'
         type: string
-        required: false
-        default: '0.7.1'
-      pplcv-ver:
-        description: 'OpenCV version'
-        type: string
-        required: false
-        default: '4.5.5'
-      onnxruntime-ver:
-        description: 'ONNXRuntime version'
-        type: string
-        required: false
-        default: '1.8.1'
-      ncnn-ver:
-        description: 'ncnn version'
-        type: string
-        required: false
-        default: '20221128'
-      openvino-ver:
-        description: 'OpenVINO version'
-        type: string
-        required: false
-        default: '2022.2'
-      tensorrt-ver:
-        description: 'TensorRT version'
-        type: string
-        required: false
-        default: '8.2.3.0'
+        required: true
+        default: '{
+          "opencv": "4.5.5",
+          "pplcv": "0.7.1",
+          "onnxruntime": "1.8.1"
+        }'
+      # opencv-ver:
+      #   description: 'ppl.cv version'
+      #   type: string
+      #   required: false
+      #   default: '0.7.1'
+      # pplcv-ver:
+      #   description: 'OpenCV version'
+      #   type: string
+      #   required: false
+      #   default: '4.5.5'
+      # onnxruntime-ver:
+      #   description: 'ONNXRuntime version'
+      #   type: string
+      #   required: false
+      #   default: '1.8.1'
+      # ncnn-ver:
+      #   description: 'ncnn version'
+      #   type: string
+      #   required: false
+      #   default: '20221128'
+      # openvino-ver:
+      #   description: 'OpenVINO version'
+      #   type: string
+      #   required: false
+      #   default: '2022.2'
+      # tensorrt-ver:
+      #   description: 'TensorRT version'
+      #   type: string
+      #   required: false
+      #   default: '8.2.3.0'
       cuda-ver:
         description: 'CUDA version'
         type: string
         required: false
         default: '10.2;11.1'
+
+env:
+
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -163,7 +175,8 @@ jobs:
       - name: Install ppl.cv
         working-directory: ..
         run: |
-          git clone -b ${{ github.event.inputs.pplcv-ver }} --depth 1 https://github.com/openppl-public/ppl.cv.git
+          $pplcv-ver = ${{ fromJson(github.event.inputs.ver-info).pplcv }}
+          git clone -b $pplcv-ver --depth 1 https://github.com/openppl-public/ppl.cv.git
           cd ppl.cv
           cmake .. -G "Visual Studio 16 2019" -A x64 -T v142,cuda="$env:CUDA_PATH `
             -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=install -DPPLCV_USE_CUDA=ON `
