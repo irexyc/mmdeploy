@@ -13,9 +13,9 @@ on:
         required: true
         type: boolean
         default: true
-      build-on-ubuntu-18-04:
+      build-on-ubuntu:
         required: true
-        description: 'Build on Ubuntu 18.04'
+        description: 'Build on Ubuntu'
         type: boolean
         default: true
       target-backends-cpu:
@@ -35,18 +35,23 @@ on:
         default: '{
           "opencv": "4.5.5",
           "pplcv": "0.7.1",
-          "onnxruntime": "1.8.1"
+          "onnxruntime": "1.8.1",
+          "ncnn": "20221128",
+          "openvino": "2022.2",
+          "tensorrt": "8.2.3.0",
+          "cuda": "10.2;11.1",
+          "ubuntu": "18.04;20.04;22.04"
         }'
       # opencv-ver:
-      #   description: 'ppl.cv version'
-      #   type: string
-      #   required: false
-      #   default: '0.7.1'
-      # pplcv-ver:
       #   description: 'OpenCV version'
       #   type: string
       #   required: false
       #   default: '4.5.5'
+      # pplcv-ver:
+      #   description: 'ppl.cv version'
+      #   type: string
+      #   required: false
+      #   default: '0.7.1'
       # onnxruntime-ver:
       #   description: 'ONNXRuntime version'
       #   type: string
@@ -67,11 +72,11 @@ on:
       #   type: string
       #   required: false
       #   default: '8.2.3.0'
-      cuda-ver:
-        description: 'CUDA version'
-        type: string
-        required: false
-        default: '10.2;11.1'
+      # cuda-ver:
+      #   description: 'CUDA version'
+      #   type: string
+      #   required: false
+      #   default: '10.2;11.1'
 
 
 concurrency:
@@ -146,7 +151,7 @@ jobs:
         with:
           script: |
             if (context.eventName === "workflow_dispatch") {
-              var cuda_var = "${{ github.event.inputs.cuda-ver }}"
+              var cuda_var = "${{ fromJson(github.event.inputs.ver-info).cuda }}"
               cuda_var = cuda_var.replace('10.2', '10.2.89')
               cuda_var = cuda_var.replace('11.1', '11.1.1')
               cuda_var = cuda_var.replace('11.2', '11.2.2')
@@ -173,8 +178,8 @@ jobs:
       - name: Install ppl.cv
         working-directory: ..
         run: |
-          $pplcv-ver = ${{ fromJson(github.event.inputs.ver-info).pplcv }}
-          git clone -b $pplcv-ver --depth 1 https://github.com/openppl-public/ppl.cv.git
+          ${pplcv-ver} = "${{ fromJson(github.event.inputs.ver-info).pplcv }}"
+          git clone -b ${pplcv-ver} --depth 1 https://github.com/openppl-public/ppl.cv.git
           cd ppl.cv
           cmake .. -G "Visual Studio 16 2019" -A x64 -T v142,cuda="$env:CUDA_PATH `
             -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=install -DPPLCV_USE_CUDA=ON `
