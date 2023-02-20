@@ -281,16 +281,12 @@ jobs:
         device: ${{ fromJSON(needs.linux_build_matrix.outputs.device) }}
     runs-on: ${{ matrix.os }}
     steps:
-      - name: download-abc
-        uses: actions/download-artifact@v3
-        with:
-          name: abc
       - name: download-opencv
         if: ${{ matrix.device == 'cpu' }}
         uses: actions/download-artifact@v3
         with:
           name: ${{ matrix.os }}-opencv
-      - name: download-both
+      - name: download-pplcv
         if: ${{ matrix.device == 'cuda' }}
         uses: actions/download-artifact@v3
         with:
