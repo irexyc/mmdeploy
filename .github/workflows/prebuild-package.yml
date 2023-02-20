@@ -232,11 +232,10 @@ jobs:
           script: |
             if (context.eventName === "workflow_dispatch") {
               DEVICE = []
-              console.log(DEVICE)
-              if (github.event.inputs.target-backends-cpu != "") {
+              if ("${{ github.event.inputs.target-backends-cpu }}" != "") {
                 DEVICE.push("cpu")
               }
-              if (github.event.inputs.target-backends-cuda != "") {
+              if ("${{ github.event.inputs.target-backends-cuda }}" != "") {
                 DEVICE.push("cuda")
               }
               console.log(DEVICE)
