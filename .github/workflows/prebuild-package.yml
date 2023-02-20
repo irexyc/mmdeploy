@@ -238,17 +238,7 @@ jobs:
               if (github.event.inputs.target-backends-cuda != "") {
                 DEVICE.push("cuda")
               }
-              core.setOutput('device', ${DEVICE});
-              # var cuda_var = "${{ fromJson(github.event.inputs.ver-info).cuda }}"
-              # cuda_var = cuda_var.replace('10.2', '10.2.89')
-              # cuda_var = cuda_var.replace('11.1', '11.1.1')
-              # cuda_var = cuda_var.replace('11.2', '11.2.2')
-              # cuda_var = cuda_var.replace('11.3', '11.3.1')
-              # cuda_var = cuda_var.replace('11.4', '11.4.3')
-              # cuda_var = cuda_var.replace('11.5', '11.5.2')
-              # cuda_var = cuda_var.replace('11.6', '11.6.2')
-              # cuda_var = cuda_var.replace('11.7', '11.7.0')
-              # return cuda_var.split(';')
+              core.setOutput('device', ${DEVICE})
             }
 
   linux-x86_64:
