@@ -250,9 +250,18 @@ jobs:
         device: ${{ fromJSON(needs.linux_build_matrix.outputs.device) }}
     runs-on: ${{ matrix.os }}
     steps:
-      - name: Echo
+      - name: build-opencv
+        if: ${{ matrix.device }} == 'cpu'
+        id: build-opencv
         run: |
-          echo ${{ matrix.device }}
+          echo "build opencv"
+          touch "${{ matrix.os }}-opencv"
+      - name: Upload opencv for job
+        if: ${{ matrix.device }} == 'cpu'
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ matrix.os }}-opencv
+          path: ${{ matrix.os }}-opencv
 
 
   linux-x86-64-build:
