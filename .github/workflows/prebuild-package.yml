@@ -54,7 +54,7 @@ on:
         required: false
         default: '8.2.3.0'
       cuda-ver:
-        description: 'TensorRT version'
+        description: 'CUDA version'
         type: string
         required: false
         default: '10.2;11.1'
@@ -131,7 +131,8 @@ jobs:
         with:
           script: |
             if (context.eventName === "workflow_dispatch") {
-              return [18]
+              const var = ${{ github.event.inputs.cuda-ver }}
+              return [var.replace(";", ",")]
             }
       - name: Debug
         run: |
