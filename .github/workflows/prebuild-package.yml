@@ -53,6 +53,11 @@ on:
         type: string
         required: false
         default: '8.2.3.0'
+      cuda-ver:
+        description: 'TensorRT version'
+        type: string
+        required: false
+        default: '10.2;11.1'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -61,69 +66,94 @@ concurrency:
 permissions: write-all
 
 jobs:
-  windows-10-cpu:
-    runs-on: windows-latest
-    if: (github.event.inputs.build-on-win10 == 'true') && (github.event.inputs.target-backends-cpu != 'none')
-    steps:
-      - name: Install OpenCV
-        working-directory: ..
-        run: |
-          git clone -b ${{ github.event.inputs.opencv-ver}} --depth=1 https://github.com/opencv/opencv.git
-          cd opencv; mkdir build; cd build
-          cmake .. -A x64 -T v142 -DBUILD_TESTS=OFF -DBUILD_PERF_TESTS=OFF -DBUILD_SHARED_LIBS=OFF `
-            -DBUILD_WITH_STATIC_CRT=OFF -DBUILD_JAVA=OFF -DBUILD_opencv_java=OFF -DBUILD_opencv_python2=OFF `
-            -DBUILD_opencv_python3=OFF
-          cmake --build . --config Release -j
-          cmake --install . --config Release
-          cd install/x64/vc16/staticlib
-          $OpenCV_DIR = [IO.Path]::Combine("$pwd")
-          echo "OpenCV_DIR=$OpenCV_DIR" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-      - name: Install ONNX Runtime
-        working-directory: ..
-        run: |
-          $onnxruntimeVer = "${{ github.event.inputs.onnxruntime-ver }}"
-          $url = "https://github.com/microsoft/onnxruntime/releases/download/v$onnxruntimeVer/onnxruntime-win-x64-$onnxruntimeVer.zip"
-          $out = "onnxruntime"
-          echo $url
-          Invoke-WebRequest -Uri $url -OutFile "$out.zip"
-          Expand-Archive "$out.zip" $out
-          $ONNXRUNTIME_DIR = [IO.Path]::Combine("$pwd", "$out", "$(ls $out)")
-          echo "ONNXRUNTIME_DIR=$ONNXRUNTIME_DIR" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-      - name: Install Conda
-        uses: conda-incubator/setup-miniconda@v2
-      - name: Install python
-        run: |
-          conda create -n mmdeploy-3.6 python=3.6
-          conda create -n mmdeploy-3.7 python=3.7
-          conda create -n mmdeploy-3.8 python=3.8
-          conda create -n mmdeploy-3.9 python=3.9
-      - name: Checkout repository
-        uses: actions/checkout@v3
-        with:
-          submodules: 'recursive'
-      - name: Build
-        run: |
-          conda activate mmdeploy-3.6
-          pip install pyyaml packaging
-          mkdir packing; cd packing
-          python ../tools/package_tools/mmdeploy_builder.py ../tools/package_tools/configs/windows_x64-cpu.yaml ../
-          $pkg = $(ls).Name
-          Compress-Archive -Path $pkg -DestinationPath "$pkg.zip"
-      - name: Deploy
-        uses: softprops/action-gh-release@v1
-        if: startsWith(github.ref, 'refs/tags/v')
-        with:
-          files: |
-            packing/*.zip
-
-
-  # windows-10-cuda:
+  # windows-10-cpu:
   #   runs-on: windows-latest
+  #   if: (github.event.inputs.build-on-win10 == 'true') && (github.event.inputs.target-backends-cpu != 'none')
   #   steps:
+  #     - name: Install OpenCV
+  #       working-directory: ..
+  #       run: |
+  #         git clone -b ${{ github.event.inputs.opencv-ver}} --depth=1 https://github.com/opencv/opencv.git
+  #         cd opencv; mkdir build; cd build
+  #         cmake .. -A x64 -T v142 -DBUILD_TESTS=OFF -DBUILD_PERF_TESTS=OFF -DBUILD_SHARED_LIBS=OFF `
+  #           -DBUILD_WITH_STATIC_CRT=OFF -DBUILD_JAVA=OFF -DBUILD_opencv_java=OFF -DBUILD_opencv_python2=OFF `
+  #           -DBUILD_opencv_python3=OFF
+  #         cmake --build . --config Release -j
+  #         cmake --install . --config Release
+  #         cd install/x64/vc16/staticlib
+  #         $OpenCV_DIR = [IO.Path]::Combine("$pwd")
+  #         echo "OpenCV_DIR=$OpenCV_DIR" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+  #     - name: Install ONNX Runtime
+  #       working-directory: ..
+  #       run: |
+  #         $onnxruntimeVer = "${{ github.event.inputs.onnxruntime-ver }}"
+  #         $url = "https://github.com/microsoft/onnxruntime/releases/download/v$onnxruntimeVer/onnxruntime-win-x64-$onnxruntimeVer.zip"
+  #         $out = "onnxruntime"
+  #         echo $url
+  #         Invoke-WebRequest -Uri $url -OutFile "$out.zip"
+  #         Expand-Archive "$out.zip" $out
+  #         $ONNXRUNTIME_DIR = [IO.Path]::Combine("$pwd", "$out", "$(ls $out)")
+  #         echo "ONNXRUNTIME_DIR=$ONNXRUNTIME_DIR" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+  #     - name: Install Conda
+  #       uses: conda-incubator/setup-miniconda@v2
+  #     - name: Install python
+  #       run: |
+  #         conda create -n mmdeploy-3.6 python=3.6
+  #         conda create -n mmdeploy-3.7 python=3.7
+  #         conda create -n mmdeploy-3.8 python=3.8
+  #         conda create -n mmdeploy-3.9 python=3.9
   #     - name: Checkout repository
   #       uses: actions/checkout@v3
   #       with:
   #         submodules: 'recursive'
+  #     - name: Build
+  #       run: |
+  #         conda activate mmdeploy-3.6
+  #         pip install pyyaml packaging
+  #         mkdir packing; cd packing
+  #         python ../tools/package_tools/mmdeploy_builder.py ../tools/package_tools/configs/windows_x64-cpu.yaml ../
+  #         $pkg = $(ls).Name
+  #         Compress-Archive -Path $pkg -DestinationPath "$pkg.zip"
+  #     - name: Deploy
+  #       uses: softprops/action-gh-release@v1
+  #       if: startsWith(github.ref, 'refs/tags/v')
+  #       with:
+  #         files: |
+  #           packing/*.zip
+
+  cuda_matrix:
+    runs-on: ubuntu-18.04
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.result }}
+    steps:
+      - uses: actions/github-script@v6
+        id: set-matrix
+        with:
+          script: |
+            if (context.eventName === "workflow_dispatch") {
+              return [18]
+            }
+      - name: Debug
+        run: |
+          echo "${{ steps.set-matrix.outputs.result }}"
+
+
+  windows-10-cuda:
+    needs: cuda_matrix
+    runs-on: windows-latest
+    if: (github.event.inputs.build-on-win10 == 'true') && (github.event.inputs.target-backends-cuda != 'none')
+    strategy:
+      matrix:
+        version: ${{ fromJSON(needs.cuda_matrix.outputs.matrix) }}
+    steps:
+      - name: Debug
+        run: |
+          echo ${{ matrix.version }}
+
+      # - name: Checkout repository
+      #   uses: actions/checkout@v3
+      #   with:
+      #     submodules: 'recursive'
 
   # ubuntu20-04-prebuild-package:
   #   runs-on: ubuntu-18.04
