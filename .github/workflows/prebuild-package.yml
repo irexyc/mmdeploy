@@ -73,8 +73,6 @@ on:
         required: false
         default: '10.2;11.1'
 
-env:
-
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
