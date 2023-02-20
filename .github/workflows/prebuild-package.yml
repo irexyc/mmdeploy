@@ -254,15 +254,26 @@ jobs:
         if: ${{ matrix.device }} == 'cpu'
         id: build-opencv
         run: |
-          echo "build opencv"
+          echo "build opencv" > "${{ matrix.os }}-opencv"
           touch "${{ matrix.os }}-opencv"
+      - name: build-pplcv
+        if: ${{ matrix.device }} == 'cuda'
+        id: build-pplcv
+        run: |
+          echo "build pplcv" > "${{ matrix.os }}-pplcv"
+          touch "${{ matrix.os }}-pplcv"
       - name: Upload opencv for job
         if: ${{ matrix.device }} == 'cpu'
         uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.os }}-opencv
           path: ${{ matrix.os }}-opencv
-
+      - name: Upload pplcv for job
+        if: ${{ matrix.device }} == 'cuda'
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ matrix.os }}-pplcv
+          path: ${{ matrix.os }}-pplcv
 
   linux-x86-64-build:
     needs: [linux-x86_64, linux_build_matrix]
@@ -272,10 +283,21 @@ jobs:
         device: ${{ fromJSON(needs.linux_build_matrix.outputs.device) }}
     runs-on: ${{ matrix.os }}
     steps:
+      - name: download-opencv
+        if: ${{ matrix.device }} == 'cpu'
+        uses: actions/download-artifact@v3
+        with:
+          name: ${{ matrix.os }}-opencv
+      - name: download-both
+        if: ${{ matrix.device }} == 'cuda'
+        uses: actions/download-artifact@v3
+        with:
+          name: |
+            ${{ matrix.os }}-opencv
+            ${{ matrix.os }}-pplcv
       - name: Echo
         run: |
-          echo ${{ matrix.device }}
-          echo ${{ matrix.os }}
+          ls
 
 
 
