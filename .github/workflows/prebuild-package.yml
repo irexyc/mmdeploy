@@ -190,7 +190,7 @@ jobs:
           Invoke-WebRequest -Uri $url -OutFile "$out.zip"
           Expand-Archive "$out.zip" $out
           $CUDNN_DIR = [IO.Path]::Combine("$pwd", "$out", "$(ls $out)")
-          echo "TENSORRT_DIR=$TENSORRT_DIR" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          echo "CUDNN_DIR=$CUDNN_DIR" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
           # set path & copy dll
       - name: Install Conda
         uses: conda-incubator/setup-miniconda@v2
@@ -218,6 +218,52 @@ jobs:
         with:
           files: |
             packing/*.zip
+
+  linux_build_matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      device: ${{ steps.set-matrix.outputs.device }}
+      # os: ${{ steps.set-matrix.outputs.os }}
+      # cuda: ${{ steps.set-matrix.outputs.cuda }}
+    steps:
+      - uses: actions/github-script@v6
+        id: set-matrix
+        with:
+          script: |
+            if (context.eventName === "workflow_dispatch") {
+              DEVICE = []
+              if (github.event.inputs.target-backends-cpu != "") {
+                DEVICE.push("cpu")
+              }
+              if (github.event.inputs.target-backends-cuda != "") {
+                DEVICE.push("cuda")
+              }
+              echo ::set-output name=device::${DEVICE}
+              # var cuda_var = "${{ fromJson(github.event.inputs.ver-info).cuda }}"
+              # cuda_var = cuda_var.replace('10.2', '10.2.89')
+              # cuda_var = cuda_var.replace('11.1', '11.1.1')
+              # cuda_var = cuda_var.replace('11.2', '11.2.2')
+              # cuda_var = cuda_var.replace('11.3', '11.3.1')
+              # cuda_var = cuda_var.replace('11.4', '11.4.3')
+              # cuda_var = cuda_var.replace('11.5', '11.5.2')
+              # cuda_var = cuda_var.replace('11.6', '11.6.2')
+              # cuda_var = cuda_var.replace('11.7', '11.7.0')
+              # return cuda_var.split(';')
+            }
+
+  linux-x86_64:
+    needs: linux_build_matrix
+    strategy:
+      matrix:
+        os: [ubuntu-18.04, ubuntu-20.04, ubuntu-22.04]
+        device: ${{ fromJSON(needs.linux_build_matrix.outputs.device) }}
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Echo
+        run: |
+          echo ${{ matrix.device }}
+
+
 
   # ubuntu20-04-prebuild-package:
   #   runs-on: ubuntu-18.04
