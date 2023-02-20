@@ -93,7 +93,7 @@ jobs:
   #     - name: Install OpenCV
   #       working-directory: ..
   #       run: |
-  #         git clone -b ${{ github.event.inputs.opencv-ver}} --depth=1 https://github.com/opencv/opencv.git
+  #         git clone -b ${{ fromJson(github.event.inputs.ver-info).opencv }} --depth=1 https://github.com/opencv/opencv.git
   #         cd opencv; mkdir build; cd build
   #         cmake .. -A x64 -T v142 -DBUILD_TESTS=OFF -DBUILD_PERF_TESTS=OFF -DBUILD_SHARED_LIBS=OFF `
   #           -DBUILD_WITH_STATIC_CRT=OFF -DBUILD_JAVA=OFF -DBUILD_opencv_java=OFF -DBUILD_opencv_python2=OFF `
@@ -106,7 +106,7 @@ jobs:
   #     - name: Install ONNX Runtime
   #       working-directory: ..
   #       run: |
-  #         $onnxruntimeVer = "${{ github.event.inputs.onnxruntime-ver }}"
+  #         $onnxruntimeVer = "${{ fromJson(github.event.inputs.ver-info).onnxruntime }}"
   #         $url = "https://github.com/microsoft/onnxruntime/releases/download/v$onnxruntimeVer/onnxruntime-win-x64-$onnxruntimeVer.zip"
   #         $out = "onnxruntime"
   #         echo $url
@@ -179,12 +179,14 @@ jobs:
         working-directory: ..
         run: |
           ${pplcv-ver} = "${{ fromJson(github.event.inputs.ver-info).pplcv }}"
-          git clone -b ${pplcv-ver} --depth 1 https://github.com/openppl-public/ppl.cv.git
-          cd ppl.cv
-          cmake .. -G "Visual Studio 16 2019" -A x64 -T v142,cuda="$env:CUDA_PATH `
+          git clone -b v${pplcv-ver} --depth 1 https://github.com/openppl-public/ppl.cv.git
+          cd ppl.cv; mkdir pplcv-build; cd pplcv-build
+          cmake .. -A x64 -T v142,cuda="$env:CUDA_PATH" `
             -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=install -DPPLCV_USE_CUDA=ON `
             -DPPLCV_USE_MSVC_STATIC_RUNTIME=OFF
-          cd pplcv-build/install/lib/cmake/ppl
+          cmake --build . --config Release -j
+          cmake --install . --config Release
+          cd install/lib/cmake/ppl
           $pplcv_DIR = [IO.Path]::Combine("$pwd")
           echo "pplcv_DIR=$pplcv_DIR" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
       - name: Debug
