@@ -242,7 +242,7 @@ jobs:
               core.setOutput('device', DEVICE)
             }
 
-  linux-x86_64-prepare:
+  linux-x86_64_prepare:
     name: prepare
     needs: linux-x86_64_build_matrix
     strategy:
@@ -274,9 +274,9 @@ jobs:
           name: ${{ matrix.os }}-pplcv
           path: ${{ matrix.os }}-pplcv
 
-  linux-x86-64-build:
+  linux-x86-64_build:
     name: build
-    needs: [linux-x86_64, linux-x86_64_build_matrix]
+    needs: [linux-x86_64_prepare, linux-x86_64_build_matrix]
     strategy:
       matrix:
         os: [ubuntu-18.04, ubuntu-20.04, ubuntu-22.04]
