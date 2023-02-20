@@ -223,8 +223,8 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       device: ${{ steps.set-matrix.outputs.device }}
-      # os: ${{ steps.set-matrix.outputs.os }}
-      # cuda: ${{ steps.set-matrix.outputs.cuda }}
+      os: ${{ steps.set-matrix.outputs.os }}
+      cuda: ${{ steps.set-matrix.outputs.cuda }}
     steps:
       - uses: actions/github-script@v6
         id: set-matrix
@@ -238,8 +238,13 @@ jobs:
               if ("${{ github.event.inputs.target-backends-cuda }}" != "") {
                 DEVICE.push("cuda")
               }
-              console.log(DEVICE)
               core.setOutput('device', DEVICE)
+              var OS = "${{ fromJson(github.event.inputs.ver-info).ubuntu }}"
+              core.setOutput('os', OS.split(';'))
+              var CUDA = "${{ fromJson(github.event.inputs.ver-info).cuda }}"
+              core.setOutput('cuda', OS.split(';'))
+              console.log(OS)
+              console.log(CUDA)
             }
 
   linux-x86_64_prepare:
@@ -279,7 +284,7 @@ jobs:
     needs: [linux-x86_64_prepare, linux-x86_64_build_matrix]
     strategy:
       matrix:
-        os: [ubuntu-18.04, ubuntu-20.04, ubuntu-22.04]
+        os: ${{ fromJSON(needs.linux-x86_64_build_matrix.outputs.os) }}
         device: ${{ fromJSON(needs.linux-x86_64_build_matrix.outputs.device) }}
     runs-on: ${{ matrix.os }}
     steps:
@@ -297,6 +302,13 @@ jobs:
           ls
           cat ${{ matrix.os }}-opencv
 
+  # linux-x86-64_deploy:
+  #   name: deploy
+  #   needs: linux-x86-64_build
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: download artifact
+  #     - name: deploy
 
 
   # ubuntu20-04-prebuild-package:
