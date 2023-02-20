@@ -239,6 +239,7 @@ jobs:
                 DEVICE.push("cuda")
               }
               console.log(DEVICE)
+              core.setOutput('device', DEVICE)
             }
 
   linux-x86_64:
