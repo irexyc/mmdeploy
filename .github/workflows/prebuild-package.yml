@@ -282,7 +282,6 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: download-opencv
-        if: ${{ matrix.device == 'cpu' }}
         uses: actions/download-artifact@v3
         with:
           name: ${{ matrix.os }}-opencv
