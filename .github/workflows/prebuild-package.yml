@@ -132,7 +132,7 @@ jobs:
           script: |
             if (context.eventName === "workflow_dispatch") {
               const cuda_var = "${{ github.event.inputs.cuda-ver }}"
-              return [cuda_var.replace(";", ",")]
+              return cuda_var.split(';')
             }
       - name: Debug
         run: |
