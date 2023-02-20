@@ -232,6 +232,7 @@ jobs:
           script: |
             if (context.eventName === "workflow_dispatch") {
               DEVICE = []
+              console.log(DEVICE)
               if (github.event.inputs.target-backends-cpu != "") {
                 DEVICE.push("cpu")
               }
@@ -239,7 +240,6 @@ jobs:
                 DEVICE.push("cuda")
               }
               console.log(DEVICE)
-              # core.setOutput('device', 'abc')
             }
 
   linux-x86_64:
