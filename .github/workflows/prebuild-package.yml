@@ -238,7 +238,7 @@ jobs:
               if (github.event.inputs.target-backends-cuda != "") {
                 DEVICE.push("cuda")
               }
-              core.setOutput('device', ${DEVICE})
+              core.setOutput('device', DEVICE)
             }
 
   linux-x86_64:
