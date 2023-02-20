@@ -1,5 +1,5 @@
 global_config:
-  cmake_flags: ['-A x64 -T v142,cuda=%CUDA_PATH%']
+  cmake_flags: ['-A x64 -T v142,cuda="%CUDA_PATH%"']
   cmake_envs:
     MMDEPLOY_BUILD_SDK: "ON"
     MMDEPLOY_BUILD_SDK_MONOLITHIC: "ON"
