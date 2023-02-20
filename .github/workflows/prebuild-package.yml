@@ -219,7 +219,7 @@ jobs:
           files: |
             packing/*.zip
 
-  linux_build_matrix:
+  linux-x86_64_build_matrix:
     runs-on: ubuntu-latest
     outputs:
       device: ${{ steps.set-matrix.outputs.device }}
@@ -242,12 +242,13 @@ jobs:
               core.setOutput('device', DEVICE)
             }
 
-  linux-x86_64:
-    needs: linux_build_matrix
+  linux-x86_64-prepare:
+    name: prepare
+    needs: linux-x86_64_build_matrix
     strategy:
       matrix:
         os: [ubuntu-18.04, ubuntu-20.04, ubuntu-22.04]
-        device: ${{ fromJSON(needs.linux_build_matrix.outputs.device) }}
+        device: ${{ fromJSON(needs.linux-x86_64_build_matrix.outputs.device) }}
     runs-on: ${{ matrix.os }}
     steps:
       - name: build-opencv
@@ -274,11 +275,12 @@ jobs:
           path: ${{ matrix.os }}-pplcv
 
   linux-x86-64-build:
-    needs: [linux-x86_64, linux_build_matrix]
+    name: build
+    needs: [linux-x86_64, linux-x86_64_build_matrix]
     strategy:
       matrix:
         os: [ubuntu-18.04, ubuntu-20.04, ubuntu-22.04]
-        device: ${{ fromJSON(needs.linux_build_matrix.outputs.device) }}
+        device: ${{ fromJSON(needs.linux-x86_64_build_matrix.outputs.device) }}
     runs-on: ${{ matrix.os }}
     steps:
       - name: download-opencv
