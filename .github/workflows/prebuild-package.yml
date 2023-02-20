@@ -183,7 +183,7 @@ jobs:
           $TENSORRT_DIR = [IO.Path]::Combine("$pwd", "$out", "$(ls $out)")
           echo "TENSORRT_DIR=$TENSORRT_DIR" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
           # set path & copy dll
-      - name: Install CuDNN
+      - name: Install cuDNN
         run: |
           $url = "https://github.com/irexyc/mmdeploy-ci-resource/releases/download/cudnn/cudnn-11.3-windows-x64-v8.2.1.32.zip"
           $out = "cudnn"
@@ -238,7 +238,7 @@ jobs:
               if (github.event.inputs.target-backends-cuda != "") {
                 DEVICE.push("cuda")
               }
-              core.setOutput('device', DEVICE)
+              core.setOutput('device', 'abc')
             }
 
   linux-x86_64:
