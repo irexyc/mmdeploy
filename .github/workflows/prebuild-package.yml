@@ -238,7 +238,7 @@ jobs:
               if (github.event.inputs.target-backends-cuda != "") {
                 DEVICE.push("cuda")
               }
-              echo ::set-output name=device::${DEVICE}
+              core.setOutput('device', ${DEVICE});
               # var cuda_var = "${{ fromJson(github.event.inputs.ver-info).cuda }}"
               # cuda_var = cuda_var.replace('10.2', '10.2.89')
               # cuda_var = cuda_var.replace('11.1', '11.1.1')
