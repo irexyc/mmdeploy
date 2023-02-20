@@ -282,7 +282,6 @@ jobs:
         run: |
           touch abc
       - name: Upload abc
-        if: ${{ matrix.device == 'cpu' }}
         uses: actions/upload-artifact@v3
         with:
           name: abc
