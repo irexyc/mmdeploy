@@ -78,7 +78,8 @@ jobs:
         include:
           - os: ubuntu-20.04
             container: ghcr.io/catthehacker/ubuntu:full-18.04
-    runs-on: ${{ matrix.container }}
+    runs-on: ubuntu-latest
+    container: ${{ matrix.container }}
     steps:
       - run: |
           mkdir -p ${{ github.workspace }}/artifact
