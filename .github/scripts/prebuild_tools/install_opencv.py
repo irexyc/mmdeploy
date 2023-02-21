@@ -5,9 +5,11 @@ import sys
 
 
 def safe_call(cmd):
+    print(cmd)
     code = os.WEXITSTATUS(os.system(cmd))
     if code != 0:
         sys.exit(code)
+
 
 def parse_args():
     parser = argparse.ArgumentParser(
@@ -24,6 +26,13 @@ def parse_args():
 
 def build(args):
     os.chdir(args.work_dir)
+
+    cmd = f'git clone -b {args.version} --depth=1 https://github.com/opencv/opencv.git'
+    safe_call(cmd)
+    safe_call('cd opencv')
+    safe_call('mkdir build')
+    safe_call('cd build')
+
     if args.platform == 'win32':
         pass
     elif args.platform == 'linux':
@@ -39,12 +48,10 @@ def build(args):
                -DCMAKE_INSTALL_PREFIX=install
         '''
 
-    safe_call('sdfs')
-    safe_call('mkdir build')
-    safe_call('cd build')
     safe_call(cmd)
     safe_call('cmake --build . --config Release -j')
     safe_call('cmake --install . --config Release')
+
 
 def main():
     args = parse_args()
