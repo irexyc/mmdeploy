@@ -252,6 +252,12 @@ jobs:
       - name: build-opencv
         run: |
           echo "build opencv" > "${{ matrix.os }}-opencv"
+      # - name: download-onnxruntime
+      #   run: |
+      #     ls
+      # - name: download-openvino
+      #   run: |
+      #     ls
       - name: Upload opencv for job
         uses: actions/upload-artifact@v3
         with:
@@ -288,9 +294,13 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: ${{ matrix.os }}-opencv
+          path: ../third_party
       - name: Echo
         run: |
           ls
+          echo '###'
+          ls ..
+          echo '###'
           cat ${{ matrix.os }}-opencv
 
   linux-x86_64_build_cuda:
@@ -313,66 +323,6 @@ jobs:
         run: |
           ls
           cat ${{ matrix.os }}-${{ matrix.cuda }}-pplcv
-
-
-  # linux-x86_64_prepare:
-  #   name: prepare
-  #   needs: linux-x86_64_build_matrix
-  #   strategy:
-  #     matrix:
-  #       os: ${{ fromJSON(needs.linux-x86_64_build_matrix.outputs.os) }}
-  #       device: ${{ fromJSON(needs.linux-x86_64_build_matrix.outputs.device) }}
-  #   runs-on: ${{ matrix.os }}
-  #   steps:
-  #     - name: build-opencv
-  #       if: ${{ matrix.device == 'cpu' }}
-  #       id: build-opencv
-  #       run: |
-  #         echo "build opencv" > "${{ matrix.os }}-opencv"
-  #     - name: Upload opencv for job
-  #       if: ${{ matrix.device == 'cpu' }}
-  #       uses: actions/upload-artifact@v3
-  #       with:
-  #         name: ${{ matrix.os }}-opencv
-  #         path: ${{ matrix.os }}-opencv
-  #     - name: build-pplcv
-  #       if: ${{ matrix.device == 'cuda' }}
-  #       id: build-pplcv
-  #       run: |
-  #         echo "build pplcv" > "${{ matrix.os }}-pplcv"
-  #     - name: Upload pplcv for job
-  #       if: ${{ matrix.device == 'cuda' }}
-  #       uses: actions/upload-artifact@v3
-  #       with:
-  #         name: ${{ matrix.os }}-pplcv
-  #         path: ${{ matrix.os }}-pplcv
-
-  # linux-x86-64_build:
-  #   name: build
-  #   needs: [linux-x86_64_prepare, linux-x86_64_build_matrix]
-  #   strategy:
-  #     matrix:
-  #       os: ${{ fromJSON(needs.linux-x86_64_build_matrix.outputs.os) }}
-  #       device: ${{ fromJSON(needs.linux-x86_64_build_matrix.outputs.device) }}
-  #   runs-on: ${{ matrix.os }}
-  #   steps:
-  #     - name: download-opencv
-  #       uses: actions/download-artifact@v3
-  #       with:
-  #         name: ${{ matrix.os }}-opencv
-  #     - name: download-pplcv
-  #       if: ${{ matrix.device == 'cuda' }}
-  #       uses: actions/download-artifact@v3
-  #       with:
-  #         name: ${{ matrix.os }}-pplcv
-  #     - name: Echo
-  #       run: |
-  #         ls
-  #         cat ${{ matrix.os }}-opencv
-
-
-
-
 
 
 
