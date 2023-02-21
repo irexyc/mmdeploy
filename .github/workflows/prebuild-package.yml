@@ -200,7 +200,8 @@ jobs:
             --platform linux --version $ver --work-dir ../third_party --device cuda
       - name: Echo
         run: |
-          ls ../third_parth
+          ls ../third_party/ -lh
+          ls ../third_party/tensorrt/tensorrt/ -lh
           cat ${{ matrix.os }}-cuda${{ matrix.cuda }}-pplcv
 
 

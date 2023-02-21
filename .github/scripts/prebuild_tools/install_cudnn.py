@@ -7,18 +7,18 @@ from utils import *
 URLS = {
     'windows': {
         '10.2': {
-            '8.2.3.0': 'https://github.com/irexyc/mmdeploy-ci-resource/releases/download/cudnn/cudnn-10.2-windows10-x64-v8.2.1.32.zip',
+            '8.2.1': 'https://github.com/irexyc/mmdeploy-ci-resource/releases/download/cudnn/cudnn-10.2-windows10-x64-v8.2.1.32.zip',
         },
         '11.x': {
-            '8.2.3.0': 'https://github.com/irexyc/mmdeploy-ci-resource/releases/download/cudnn/cudnn-11.3-windows-x64-v8.2.1.32.zip',
+            '8.2.1': 'https://github.com/irexyc/mmdeploy-ci-resource/releases/download/cudnn/cudnn-11.3-windows-x64-v8.2.1.32.zip',
         }
     },
     'linux': {
         '10.2': {
-            '8.2.3.0': 'https://github.com/irexyc/mmdeploy-ci-resource/releases/download/cudnn/cudnn-10.2-linux-x64-v8.2.1.32.tgz',
+            '8.2.1': 'https://github.com/irexyc/mmdeploy-ci-resource/releases/download/cudnn/cudnn-10.2-linux-x64-v8.2.1.32.tgz',
         },
         '11.x': {
-            '8.2.3.0': 'https://github.com/irexyc/mmdeploy-ci-resource/releases/download/cudnn/cudnn-11.3-linux-x64-v8.2.1.32.tgz',
+            '8.2.1': 'https://github.com/irexyc/mmdeploy-ci-resource/releases/download/cudnn/cudnn-11.3-linux-x64-v8.2.1.32.tgz',
         }
     }
 }
