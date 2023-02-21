@@ -279,7 +279,7 @@ jobs:
           path: ${{ github.workspace }}/artifact/onnxruntime/onnxruntime
       - name: download-openvino
         run: |
-          ver="${{ fromJson(github.event.inputs.ver-info).onnxruntime }}"
+          ver="${{ fromJson(github.event.inputs.ver-info).openvino }}"
           sys="$(echo ${{ matrix.os }} | cut -d "-" -f2)"
           python3 .github/scripts/prebuild_tools/install_openvino.py \
             --platform linux --version $ver --work-dir artifact --system $sys
