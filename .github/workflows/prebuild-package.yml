@@ -276,7 +276,18 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: onnxruntime
-          path: ${{ github.workspace }}/artifact/onnxruntime/*/**
+          path: ${{ github.workspace }}/artifact/onnxruntime/onnxruntime
+      - name: download-openvino
+        run: |
+          ver="${{ fromJson(github.event.inputs.ver-info).onnxruntime }}"
+          sys="$(echo ${{ matrix.os }} | cut -d "-" -f2)"
+          python3 .github/scripts/prebuild_tools/install_openvino.py \
+            --platform linux --version $ver --work-dir artifact --system $sys
+      - name: upload-openvino
+        uses: actions/upload-artifact@v3
+        with:
+          name: openvino
+          path: ${{ github.workspace }}/artifact/openvino/openvino
 
   linux-x86_64_prepare_cuda:
     name: prepare_cuda

@@ -2,6 +2,7 @@ import os
 import argparse
 from urllib import request
 import sys
+from utils import *
 
 URLS = {
     'windows': {
@@ -27,13 +28,6 @@ URLS = {
 }
 
 
-def safe_call(cmd):
-    print(cmd)
-    code = os.WEXITSTATUS(os.system(cmd))
-    if code != 0:
-        sys.exit(code)
-
-
 def parse_args():
     parser = argparse.ArgumentParser(
         description='ONNX Runtime installation tool.')
@@ -49,13 +43,26 @@ def parse_args():
     return args
 
 
+def remove_noused(dst_folder):
+    os.chdir(dst_folder)
+    onnx_folder = os.listdir('.')[0]
+    os.rename(onnx_folder, dst_folder)
+    os.chdir(dst_folder)
+    used_files = ['lib', 'include']
+    files = os.listdir('.')
+    for f in files:
+        if f not in used_files:
+            safe_call(f'rm -rf {f}')
+
+
 def build(args):
     os.chdir(args.work_dir)
     url = URLS[args.platform][args.device][args.version]
     local_file = os.path.basename(url)
     request.urlretrieve(url, local_file)
-    os.mkdir('onnxruntime')
-    safe_call(f'tar xf {local_file} -C onnxruntime')
+    dst_folder = 'onnxruntime'
+    extract(local_file, dst_folder)
+    remove_noused(dst_folder)
 
 
 def main():
