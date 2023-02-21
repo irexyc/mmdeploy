@@ -45,179 +45,6 @@ concurrency:
 permissions: write-all
 
 jobs:
-  # windows-10-cpu:
-  #   runs-on: windows-latest
-  #   if: (github.event.inputs.build-on-win10 == 'true') && (github.event.inputs.target-backends-cpu != 'none')
-  #   steps:
-  #     - name: Install OpenCV
-  #       working-directory: ..
-  #       run: |
-  #         git clone -b ${{ fromJson(github.event.inputs.ver-info).opencv }} --depth=1 https://github.com/opencv/opencv.git
-  #         cd opencv; mkdir build; cd build
-  #         cmake .. -A x64 -T v142 -DBUILD_TESTS=OFF -DBUILD_PERF_TESTS=OFF -DBUILD_SHARED_LIBS=OFF `
-  #           -DBUILD_WITH_STATIC_CRT=OFF -DBUILD_JAVA=OFF -DBUILD_opencv_java=OFF -DBUILD_opencv_python2=OFF `
-  #           -DBUILD_opencv_python3=OFF
-  #         cmake --build . --config Release -j
-  #         cmake --install . --config Release
-  #         cd install/x64/vc16/staticlib
-  #         $OpenCV_DIR = [IO.Path]::Combine("$pwd")
-  #         echo "OpenCV_DIR=$OpenCV_DIR" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-  #     - name: Install ONNX Runtime
-  #       working-directory: ..
-  #       run: |
-  #         $onnxruntimeVer = "${{ fromJson(github.event.inputs.ver-info).onnxruntime }}"
-  #         $url = "https://github.com/microsoft/onnxruntime/releases/download/v$onnxruntimeVer/onnxruntime-win-x64-$onnxruntimeVer.zip"
-  #         $out = "onnxruntime"
-  #         echo $url
-  #         Invoke-WebRequest -Uri $url -OutFile "$out.zip"
-  #         Expand-Archive "$out.zip" $out
-  #         $ONNXRUNTIME_DIR = [IO.Path]::Combine("$pwd", "$out", "$(ls $out)")
-  #         echo "ONNXRUNTIME_DIR=$ONNXRUNTIME_DIR" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-  #     - name: Install Conda
-  #       uses: conda-incubator/setup-miniconda@v2
-  #     - name: Install python
-  #       run: |
-  #         conda create -n mmdeploy-3.6 python=3.6
-  #         conda create -n mmdeploy-3.7 python=3.7
-  #         conda create -n mmdeploy-3.8 python=3.8
-  #         conda create -n mmdeploy-3.9 python=3.9
-  #     - name: Checkout repository
-  #       uses: actions/checkout@v3
-  #       with:
-  #         submodules: 'recursive'
-  #     - name: Build
-  #       run: |
-  #         conda activate mmdeploy-3.6
-  #         pip install pyyaml packaging
-  #         mkdir packing; cd packing
-  #         python ../tools/package_tools/mmdeploy_builder.py ../tools/package_tools/configs/windows_x64-cpu.yaml ../
-  #         $pkg = $(ls).Name
-  #         Compress-Archive -Path $pkg -DestinationPath "$pkg.zip"
-  #     - name: Deploy
-  #       uses: softprops/action-gh-release@v1
-  #       if: startsWith(github.ref, 'refs/tags/v')
-  #       with:
-  #         files: |
-  #           packing/*.zip
-
-  # cuda_matrix:
-  #   runs-on: ubuntu-18.04
-  #   outputs:
-  #     matrix: ${{ steps.set-matrix.outputs.result }}
-  #   steps:
-  #     - uses: actions/github-script@v6
-  #       id: set-matrix
-  #       with:
-  #         script: |
-  #           if (context.eventName === "workflow_dispatch") {
-  #             var cuda_var = "${{ fromJson(github.event.inputs.ver-info).cuda }}"
-  #             cuda_var = cuda_var.replace('10.2', '10.2.89')
-  #             cuda_var = cuda_var.replace('11.1', '11.1.1')
-  #             cuda_var = cuda_var.replace('11.2', '11.2.2')
-  #             cuda_var = cuda_var.replace('11.3', '11.3.1')
-  #             cuda_var = cuda_var.replace('11.4', '11.4.3')
-  #             cuda_var = cuda_var.replace('11.5', '11.5.2')
-  #             cuda_var = cuda_var.replace('11.6', '11.6.2')
-  #             cuda_var = cuda_var.replace('11.7', '11.7.0')
-  #             return cuda_var.split(';')
-  #           }
-
-  # windows-10-cuda:
-  #   needs: cuda_matrix
-  #   runs-on: windows-latest
-  #   if: (github.event.inputs.build-on-win10 == 'true') && (github.event.inputs.target-backends-cuda != 'none')
-  #   strategy:
-  #     matrix:
-  #       cuda-version: ${{ fromJSON(needs.cuda_matrix.outputs.matrix) }}
-  #   steps:
-  #     - name: Install CUDA
-  #       uses: Jimver/cuda-toolkit@v0.2.8
-  #       with:
-  #         cuda: ${{ matrix.cuda-version }}
-  #     - name: Install ppl.cv
-  #       working-directory: ..
-  #       run: |
-  #         ${pplcv-ver} = "${{ fromJson(github.event.inputs.ver-info).pplcv }}"
-  #         git clone -b v${pplcv-ver} --depth 1 https://github.com/openppl-public/ppl.cv.git
-  #         cd ppl.cv; mkdir pplcv-build; cd pplcv-build
-  #         cmake .. -A x64 -T v142,cuda="$env:CUDA_PATH" `
-  #           -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=install -DPPLCV_USE_CUDA=ON `
-  #           -DPPLCV_USE_MSVC_STATIC_RUNTIME=OFF
-  #         cmake --build . --config Release -j
-  #         cmake --install . --config Release
-  #         cd install/lib/cmake/ppl
-  #         $pplcv_DIR = [IO.Path]::Combine("$pwd")
-  #         echo "pplcv_DIR=$pplcv_DIR" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-  #     - name: Install OpenCV
-  #       working-directory: ..
-  #       run: |
-  #         git clone -b ${{ fromJson(github.event.inputs.ver-info).opencv }} --depth=1 https://github.com/opencv/opencv.git
-  #         cd opencv; mkdir build; cd build
-  #         cmake .. -A x64 -T v142 -DBUILD_TESTS=OFF -DBUILD_PERF_TESTS=OFF -DBUILD_SHARED_LIBS=OFF `
-  #           -DBUILD_WITH_STATIC_CRT=OFF -DBUILD_JAVA=OFF -DBUILD_opencv_java=OFF -DBUILD_opencv_python2=OFF `
-  #           -DBUILD_opencv_python3=OFF
-  #         cmake --build . --config Release -j
-  #         cmake --install . --config Release
-  #         cd install/x64/vc16/staticlib
-  #         $OpenCV_DIR = [IO.Path]::Combine("$pwd")
-  #         echo "OpenCV_DIR=$OpenCV_DIR" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-  #     # - name: Install ONNX Runtime
-  #     #   working-directory: ..
-  #     #   run: |
-  #     #     $onnxruntimeVer = "${{ fromJson(github.event.inputs.ver-info).onnxruntime }}"
-  #     #     $url = "https://github.com/microsoft/onnxruntime/releases/download/v$onnxruntimeVer/onnxruntime-win-x64-$onnxruntimeVer.zip"
-  #     #     $out = "onnxruntime"
-  #     #     echo $url
-  #     #     Invoke-WebRequest -Uri $url -OutFile "$out.zip"
-  #     #     Expand-Archive "$out.zip" $out
-  #     #     $ONNXRUNTIME_DIR = [IO.Path]::Combine("$pwd", "$out", "$(ls $out)")
-  #     #     echo "ONNXRUNTIME_DIR=$ONNXRUNTIME_DIR" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-  #     - name: Install TensorRT
-  #       working-directory: ..
-  #       run: |
-  #         $url = "https://github.com/irexyc/mmdeploy-ci-resource/releases/download/tensorrt/TensorRT-8.2.3.0.Windows10.x86_64.cuda-11.4.cudnn8.2.zip"
-  #         $out = "tensorrt"
-  #         Invoke-WebRequest -Uri $url -OutFile "$out.zip"
-  #         Expand-Archive "$out.zip" $out
-  #         $TENSORRT_DIR = [IO.Path]::Combine("$pwd", "$out", "$(ls $out)")
-  #         echo "TENSORRT_DIR=$TENSORRT_DIR" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-  #         # set path & copy dll
-  #     - name: Install cuDNN
-  #       run: |
-  #         $url = "https://github.com/irexyc/mmdeploy-ci-resource/releases/download/cudnn/cudnn-11.3-windows-x64-v8.2.1.32.zip"
-  #         $out = "cudnn"
-  #         Invoke-WebRequest -Uri $url -OutFile "$out.zip"
-  #         Expand-Archive "$out.zip" $out
-  #         $CUDNN_DIR = [IO.Path]::Combine("$pwd", "$out", "$(ls $out)")
-  #         echo "CUDNN_DIR=$CUDNN_DIR" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-  #         # set path & copy dll
-  #     - name: Install Conda
-  #       uses: conda-incubator/setup-miniconda@v2
-  #     - name: Install python
-  #       run: |
-  #         conda create -n mmdeploy-3.6 python=3.6
-  #         conda create -n mmdeploy-3.7 python=3.7
-  #         conda create -n mmdeploy-3.8 python=3.8
-  #         conda create -n mmdeploy-3.9 python=3.9
-  #     - name: Checkout repository
-  #       uses: actions/checkout@v3
-  #       with:
-  #         submodules: 'recursive'
-  #     - name: Build
-  #       run: |
-  #         conda activate mmdeploy-3.6
-  #         pip install pyyaml packaging
-  #         mkdir packing; cd packing
-  #         python ../tools/package_tools/mmdeploy_builder.py ../tools/package_tools/configs/windows_x64-cuda.yaml ../
-  #         $pkg = $(ls).Name
-  #         Compress-Archive -Path $pkg -DestinationPath "$pkg.zip"
-  #     - name: Deploy
-  #       uses: softprops/action-gh-release@v1
-  #       if: startsWith(github.ref, 'refs/tags/v')
-  #       with:
-  #         files: |
-  #           packing/*.zip
-
   linux-x86_64_build_matrix:
     runs-on: ubuntu-latest
     outputs:
@@ -231,14 +58,14 @@ jobs:
           script: |
             if (context.eventName === "workflow_dispatch") {
               DEVICE = ["cpu"]
-              if ("${{ github.event.inputs.target-backends-cuda }}" != "") {
+              if ("${{ inputs.target-backends-cuda }}" != "") {
                 DEVICE.push("cuda")
               }
               core.setOutput('device', DEVICE)
-              var OS = "${{ fromJson(github.event.inputs.ver-info).ubuntu }}"
+              var OS = "${{ fromJson(inputs.ver-info).ubuntu }}"
               OS = OS.split(";").map(v => "ubuntu-" + v)
               core.setOutput('os', OS)
-              var CUDA = "${{ fromJson(github.event.inputs.ver-info).cuda }}"
+              var CUDA = "${{ fromJson(inputs.ver-info).cuda }}"
               core.setOutput('cuda', CUDA.split(';'))
             }
 
@@ -257,7 +84,7 @@ jobs:
       - name: build-opencv
         run: |
           echo "build opencv" > "${{ matrix.os }}-opencv"
-          # ver="${{ fromJson(github.event.inputs.ver-info).opencv }}"
+          # ver="${{ fromJson(inputs.ver-info).opencv }}"
           # python3 .github/scripts/prebuild_tools/install_opencv.py \
           #   --platform linux --version $ver
           mkdir -p artifact/opencv/build/install/opencv-files
@@ -267,32 +94,11 @@ jobs:
         with:
           name: ${{ matrix.os }}-opencv
           path: ${{ github.workspace }}/artifact/opencv/build/install
-      - name: download-onnxruntime
-        run: |
-          ver="${{ fromJson(github.event.inputs.ver-info).onnxruntime }}"
-          python3 .github/scripts/prebuild_tools/install_onnxruntime.py \
-            --platform linux --version $ver --work-dir artifact
-      - name: upload-onnxruntime
-        uses: actions/upload-artifact@v3
-        with:
-          name: onnxruntime
-          path: ${{ github.workspace }}/artifact/onnxruntime/onnxruntime
-      - name: download-openvino
-        run: |
-          ver="${{ fromJson(github.event.inputs.ver-info).openvino }}"
-          sys="$(echo ${{ matrix.os }} | cut -d "-" -f2)"
-          python3 .github/scripts/prebuild_tools/install_openvino.py \
-            --platform linux --version $ver --work-dir artifact --system $sys
-      - name: upload-openvino
-        uses: actions/upload-artifact@v3
-        with:
-          name: openvino
-          path: ${{ github.workspace }}/artifact/openvino/openvino
 
   linux-x86_64_prepare_cuda:
     name: prepare_cuda
     needs: linux-x86_64_build_matrix
-    if: ${{ github.event.inputs.target-backends-cuda != 'none' }}
+    if: ${{ inputs.target-backends-cuda != 'none' }}
     strategy:
       matrix:
         os: ${{ fromJSON(needs.linux-x86_64_build_matrix.outputs.os) }}
@@ -301,35 +107,41 @@ jobs:
     steps:
       - name: build-pplcv
         run: |
-          echo "build pplcv" > "${{ matrix.os }}-${{ matrix.cuda }}-pplcv"
+          echo "build pplcv" > "${{ matrix.os }}-cuda${{ matrix.cuda }}-pplcv"
       - name: Upload pplcv for job
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ matrix.os }}-${{ matrix.cuda }}-pplcv
-          path: ${{ matrix.os }}-${{ matrix.cuda }}-pplcv
+          name: ${{ matrix.os }}-cuda${{ matrix.cuda }}-pplcv
+          path: ${{ matrix.os }}-cuda${{ matrix.cuda }}-pplcv
 
   linux-x86_64_build_cpu:
     name: build_cpu
     needs: [linux-x86_64_prepare_cpu, linux-x86_64_build_matrix]
-    if: ${{ github.event.inputs.target-backends-cpu != 'none' }}
+    if: ${{ inputs.target-backends-cpu != 'none' }}
     strategy:
       matrix:
         os: ${{ fromJSON(needs.linux-x86_64_build_matrix.outputs.os) }}
     runs-on: ${{ matrix.os }}
     steps:
-      # - name: download-opencv
-      #   uses: actions/download-artifact@v3
-      #   with:
-      #     name: ${{ matrix.os }}-opencv
-      #     path: ../third_party
       - name: download-onnxruntime
+        run: |
+          ver="${{ fromJson(inputs.ver-info).onnxruntime }}"
+          python3 .github/scripts/prebuild_tools/install_onnxruntime.py \
+            --platform linux --version $ver --work-dir ../third_party
+      - name: download-openvino
+        run: |
+          ver="${{ fromJson(inputs.ver-info).openvino }}"
+          sys="$(echo ${{ matrix.os }} | cut -d "-" -f2)"
+          python3 .github/scripts/prebuild_tools/install_openvino.py \
+            --platform linux --version $ver --work-dir ../third_party --system $sys
+      - name: download-opencv
         uses: actions/download-artifact@v3
         with:
-          name: onnxruntime
-          path: ../third_party/onnxruntime
+          name: ${{ matrix.os }}-opencv
+          path: ../third_party
       - name: Echo
         run: |
-          ls ../third_party/onnxruntime -lh
+          ls ../third_party/ -lh
 
   linux-x86_64_build_cuda:
     name: build_cuda
@@ -337,7 +149,7 @@ jobs:
       - linux-x86_64_prepare_cpu
       - linux-x86_64_prepare_cuda
       - linux-x86_64_build_matrix
-    if: ${{ github.event.inputs.target-backends-cuda != 'none' }}
+    if: ${{ inputs.target-backends-cuda != 'none' }}
     strategy:
       matrix:
         os: ${{ fromJSON(needs.linux-x86_64_build_matrix.outputs.os) }}
@@ -382,4 +194,6 @@ jobs:
   #       with:
   #         files: |
   #           mmdeploy.tar.gz
+
   # https://docs.github.com/en/actions/using-workflows/storing-workflow-data-as-artifacts
+  # https://dev.to/n3wt0n/github-composite-actions-nest-actions-within-actions-3e5l

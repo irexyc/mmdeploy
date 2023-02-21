@@ -38,8 +38,8 @@ def parse_args():
 
 def remove_noused(dst_folder):
     os.chdir(dst_folder)
-    onnx_folder = os.listdir('.')[0]
-    os.rename(onnx_folder, dst_folder)
+    folder = os.listdir('.')[0]
+    os.rename(folder, dst_folder)
     os.chdir(dst_folder)
     used_files = ['runtime']
     files = os.listdir('.')
