@@ -1,6 +1,6 @@
 import os
 import argparse
-import subprocess
+from urllib import request
 import sys
 
 URLS = {
@@ -51,8 +51,12 @@ def parse_args():
 
 def build(args):
     os.chdir(args.work_dir)
+    url = URLS[args.platform][args.device][args.version]
+    local_file = os.path.basename(url)
+    request.urlretrieve(url, local_file)
+    os.mkdir('onnxruntime')
+    safe_call(f'tar xf {local_file} -C onnxruntime')
 
-    url = URLS['abc']
 
 def main():
     args = parse_args()

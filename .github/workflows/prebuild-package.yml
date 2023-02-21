@@ -271,10 +271,12 @@ jobs:
         run: |
           ver="${{ fromJson(github.event.inputs.ver-info).onnxruntime }}"
           python3 .github/scripts/prebuild_tools/install_onnxruntime.py \
-            --platform linux --version $ver
-      # - name: download-openvino
-      #   run: |
-      #     ls
+            --platform linux --version $ver --work-dir artifact
+      - name: upload-onnxruntime
+        uses: actions/upload-artifact@v3
+        with:
+          name: onnxruntime
+          path: ${{ github.workspace }}/artifact/onnxruntime/*/**
 
   linux-x86_64_prepare_cuda:
     name: prepare_cuda
@@ -304,18 +306,19 @@ jobs:
         os: ${{ fromJSON(needs.linux-x86_64_build_matrix.outputs.os) }}
     runs-on: ${{ matrix.os }}
     steps:
-      - name: download-opencv
+      # - name: download-opencv
+      #   uses: actions/download-artifact@v3
+      #   with:
+      #     name: ${{ matrix.os }}-opencv
+      #     path: ../third_party
+      - name: download-onnxruntime
         uses: actions/download-artifact@v3
         with:
-          name: ${{ matrix.os }}-opencv
-          path: ../third_party
+          name: onnxruntime
+          path: ../third_party/onnxruntime
       - name: Echo
         run: |
-          ls
-          echo '###'
-          ls ../third_party
-          echo '###'
-          cat ../third_party/${{ matrix.os }}-opencv
+          ls ../third_party/onnxruntime -lh
 
   linux-x86_64_build_cuda:
     name: build_cuda
