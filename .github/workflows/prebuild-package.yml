@@ -252,7 +252,6 @@ jobs:
       - name: build-opencv
         run: |
           echo "build opencv" > "${{ matrix.os }}-opencv"
-          tar cvf "${{ matrix.os }}-opencv.tar.gz" "${{ matrix.os }}-opencv"
       # - name: download-onnxruntime
       #   run: |
       #     ls
@@ -263,7 +262,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.os }}-opencv
-          path: ${{ matrix.os }}-opencv.tar.gz
+          path: ${{ matrix.os }}-opencv
 
   linux-x86_64_prepare_cuda:
     name: prepare_cuda
