@@ -253,22 +253,24 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
       - name: build-opencv
+        working-directory: ..
         run: |
           echo "build opencv" > "${{ matrix.os }}-opencv"
-          ver="${{ fromJson(github.event.inputs.ver-info).opencv }}"
-          python3 .github/scripts/prebuild_tools/install_opencv.py \
-            --platform linux --version $ver
+          # ver="${{ fromJson(github.event.inputs.ver-info).opencv }}"
+          # python3 .github/scripts/prebuild_tools/install_opencv.py \
+          #   --platform linux --version $ver
+          mkdir opencv/build/install/opencv-files
+      - name: upload-opencv
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ matrix.os }}-opencv
+          path: ../opencv/build/install
       # - name: download-onnxruntime
       #   run: |
       #     ls
       # - name: download-openvino
       #   run: |
       #     ls
-      - name: Upload opencv for job
-        uses: actions/upload-artifact@v3
-        with:
-          name: ${{ matrix.os }}-opencv
-          path: ${{ matrix.os }}-opencv
 
   linux-x86_64_prepare_cuda:
     name: prepare_cuda
