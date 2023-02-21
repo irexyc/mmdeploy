@@ -22,7 +22,7 @@ on:
         description: 'Target backends for cuda (none to skip)'
         type: string
         required: false
-        default: 'none'
+        default: 'ort'
       ver-info:
         description: 'Version setting'
         type: string
@@ -123,6 +123,10 @@ jobs:
         os: ${{ fromJSON(needs.linux-x86_64_build_matrix.outputs.os) }}
     runs-on: ${{ matrix.os }}
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          submodules: 'recursive'
       - name: download-onnxruntime
         run: |
           ver="${{ fromJson(github.event.inputs.ver-info).onnxruntime }}"
@@ -159,11 +163,11 @@ jobs:
       - name: download-pplcv
         uses: actions/download-artifact@v3
         with:
-          name: ${{ matrix.os }}-${{ matrix.cuda }}-pplcv
+          name: ${{ matrix.os }}-cuda${{ matrix.cuda }}-pplcv
       - name: Echo
         run: |
           ls
-          cat ${{ matrix.os }}-${{ matrix.cuda }}-pplcv
+          cat ${{ matrix.os }}-cuda${{ matrix.cuda }}-pplcv
 
 
 
