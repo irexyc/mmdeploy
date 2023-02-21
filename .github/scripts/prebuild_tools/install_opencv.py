@@ -29,16 +29,15 @@ def build(args):
 
     cmd = f'git clone -b {args.version} --depth=1 https://github.com/opencv/opencv.git'
     safe_call(cmd)
-    safe_call('cd opencv')
-    safe_call('mkdir build')
-    safe_call('cd build')
+    os.mkdir('opencv/build')
+    os.chdir('opencv/build')
 
     if args.platform == 'win32':
         pass
     elif args.platform == 'linux':
         cmd = '''
             cmake .. \
-                -DOPENCV_FORCE_3RDPARTY_BUILD=ON \
+               -DOPENCV_FORCE_3RDPARTY_BUILD=ON \
                -DBUILD_TESTS=OFF-DBUILD_PERF_TESTS=OFF \
                -DBUILD_SHARED_LIBS=OFF \
                -DBUILD_JAVA=OFF \
