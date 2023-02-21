@@ -77,7 +77,7 @@ jobs:
         os: ${{ fromJSON(needs.linux-x86_64_build_matrix.outputs.os) }}
         include:
           - os: ubuntu-20.04
-            container: ghcr.io/catthehacker/ubuntu:full-18.04
+            container: nektos/act-environments-ubuntu:18.04
     runs-on: ubuntu-latest
     container: ${{ matrix.container }}
     steps:
