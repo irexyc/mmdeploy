@@ -58,14 +58,14 @@ jobs:
           script: |
             if (context.eventName === "workflow_dispatch") {
               DEVICE = ["cpu"]
-              if ("${{ github.event.inputs.target-backends-cuda }}" != "") {
+              if ("${{ inputs.target-backends-cuda }}" != "") {
                 DEVICE.push("cuda")
               }
               core.setOutput('device', DEVICE)
-              var OS = "${{ fromJson(github.event.inputs.ver-info).ubuntu }}"
+              var OS = "${{ fromJson(inputs.ver-info).ubuntu }}"
               OS = OS.split(";").map(v => "ubuntu-" + v)
               core.setOutput('os', OS)
-              var CUDA = "${{ fromJson(github.event.inputs.ver-info).cuda }}"
+              var CUDA = "${{ fromJson(inputs.ver-info).cuda }}"
               core.setOutput('cuda', CUDA.split(';'))
             }
 
@@ -84,7 +84,7 @@ jobs:
       - name: build-opencv
         run: |
           echo "build opencv" > "${{ matrix.os }}-opencv"
-          # ver="${{ fromJson(github.event.inputs.ver-info).opencv }}"
+          # ver="${{ fromJson(inputs.ver-info).opencv }}"
           # python3 .github/scripts/prebuild_tools/install_opencv.py \
           #   --platform linux --version $ver
           mkdir -p artifact/opencv/build/install/opencv-files
@@ -98,7 +98,7 @@ jobs:
   linux-x86_64_prepare_cuda:
     name: prepare_cuda
     needs: linux-x86_64_build_matrix
-    if: ${{ github.event.inputs.target-backends-cuda != 'none' }}
+    if: ${{ inputs.target-backends-cuda != 'none' }}
     strategy:
       matrix:
         os: ${{ fromJSON(needs.linux-x86_64_build_matrix.outputs.os) }}
@@ -117,7 +117,7 @@ jobs:
   linux-x86_64_build_cpu:
     name: build_cpu
     needs: [linux-x86_64_prepare_cpu, linux-x86_64_build_matrix]
-    if: ${{ github.event.inputs.target-backends-cpu != 'none' }}
+    if: ${{ inputs.target-backends-cpu != 'none' }}
     strategy:
       matrix:
         os: ${{ fromJSON(needs.linux-x86_64_build_matrix.outputs.os) }}
@@ -127,14 +127,15 @@ jobs:
         uses: actions/checkout@v3
         with:
           submodules: 'recursive'
+      - run: mkdir ../third_party
       - name: download-onnxruntime
         run: |
-          ver="${{ fromJson(github.event.inputs.ver-info).onnxruntime }}"
+          ver="${{ fromJson(inputs.ver-info).onnxruntime }}"
           python3 .github/scripts/prebuild_tools/install_onnxruntime.py \
             --platform linux --version $ver --work-dir ../third_party
       - name: download-openvino
         run: |
-          ver="${{ fromJson(github.event.inputs.ver-info).openvino }}"
+          ver="${{ fromJson(inputs.ver-info).openvino }}"
           sys="$(echo ${{ matrix.os }} | cut -d "-" -f2)"
           python3 .github/scripts/prebuild_tools/install_openvino.py \
             --platform linux --version $ver --work-dir ../third_party --system $sys
@@ -153,7 +154,7 @@ jobs:
       - linux-x86_64_prepare_cpu
       - linux-x86_64_prepare_cuda
       - linux-x86_64_build_matrix
-    if: ${{ github.event.inputs.target-backends-cuda != 'none' }}
+    if: ${{ inputs.target-backends-cuda != 'none' }}
     strategy:
       matrix:
         os: ${{ fromJSON(needs.linux-x86_64_build_matrix.outputs.os) }}
