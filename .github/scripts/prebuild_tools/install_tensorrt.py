@@ -1,7 +1,6 @@
 import os
 import argparse
 from urllib import request
-import sys
 from utils import *
 
 URLS = {
@@ -60,6 +59,7 @@ def run(args):
     dst_folder = 'tensorrt'
     extract(local_file, dst_folder)
     remove_noused(dst_folder)
+    os.remove(local_file)
 
 
 def main():

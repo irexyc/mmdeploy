@@ -38,7 +38,8 @@ def build(args):
         cmd = '''
             cmake .. \
                -DOPENCV_FORCE_3RDPARTY_BUILD=ON \
-               -DBUILD_TESTS=OFF-DBUILD_PERF_TESTS=OFF \
+               -DBUILD_TESTS=OFF \
+               -DBUILD_PERF_TESTS=OFF \
                -DBUILD_SHARED_LIBS=OFF \
                -DBUILD_JAVA=OFF \
                -DBUILD_opencv_python3=OFF \

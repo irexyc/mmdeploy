@@ -146,9 +146,10 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: ${{ matrix.os }}-opencv
-          path: ../third_party
-      - name: Echo
+          path: third_party/opencv
+      - name: build-mmdeploy
         run: |
+          ls third_party/ -lh
           ls ../third_party/ -lh
 
   linux-x86_64_build_cuda:
@@ -172,12 +173,12 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: ${{ matrix.os }}-cuda${{ matrix.cuda }}-pplcv
-          path: ../third_party
+          path: third_party/pplcv
       - name: download-opencv
         uses: actions/download-artifact@v3
         with:
           name: ${{ matrix.os }}-opencv
-          path: ../third_party
+          path: third_party/opencv
       - name: download-tensorrt
         if: contains(${{ inputs.target-backends-cuda }}, 'trt')
         run: |
@@ -191,18 +192,17 @@ jobs:
           ver="${{ fromJson(inputs.ver-info).cudnn }}"
           cuda="${{ matrix.cuda }}"
           python3 .github/scripts/prebuild_tools/install_cudnn.py \
-            --platform linux --version $ver --work-dir ../third_party --cuda $cuda
+            --platform linux --version $ver --work-dir third_party --cuda $cuda
       - name: download-onnxruntime
         if: contains(${{ inputs.target-backends-cuda }}, 'ort')
         run: |
           ver="${{ fromJson(inputs.ver-info).onnxruntime }}"
           python3 .github/scripts/prebuild_tools/install_onnxruntime.py \
             --platform linux --version $ver --work-dir ../third_party --device cuda
-      - name: Echo
+      - name: build-mmdeploy
         run: |
+          ls third_party/ -lh
           ls ../third_party/ -lh
-          ls ../third_party/tensorrt/tensorrt/ -lh
-          cat ${{ matrix.os }}-cuda${{ matrix.cuda }}-pplcv
 
 
 
