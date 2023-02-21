@@ -51,6 +51,8 @@ def remove_noused(dst_folder):
 
 
 def run(args):
+    if not os.path.exists(args.work_dir):
+        os.makedirs(args.work_dir)
     os.chdir(args.work_dir)
     cuda_ver = '10.2' if args.cuda[:2] == '10' else '11.x'
     url = URLS[args.platform][cuda_ver][args.version]

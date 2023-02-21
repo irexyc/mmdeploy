@@ -25,6 +25,8 @@ def parse_args():
 
 
 def build(args):
+    if not os.path.exists(args.work_dir):
+        os.makedirs(args.work_dir)
     os.chdir(args.work_dir)
 
     cmd = f'git clone -b {args.version} --depth=1 https://github.com/opencv/opencv.git'

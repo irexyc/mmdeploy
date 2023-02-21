@@ -48,6 +48,8 @@ def remove_noused(dst_folder):
 
 
 def run(args):
+    if not os.path.exists(args.work_dir):
+        os.makedirs(args.work_dir)
     os.chdir(args.work_dir)
     if args.platform == 'windows':
         url = URLS[args.platform][args.version]
