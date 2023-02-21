@@ -299,9 +299,9 @@ jobs:
         run: |
           ls
           echo '###'
-          ls ..
+          ls ../third_party
           echo '###'
-          cat ${{ matrix.os }}-opencv
+          cat ../third_party/${{ matrix.os }}-opencv
 
   linux-x86_64_build_cuda:
     name: build_cuda
