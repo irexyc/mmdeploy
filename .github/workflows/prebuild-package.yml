@@ -255,7 +255,7 @@ jobs:
       - name: build-opencv
         run: |
           echo "build opencv" > "${{ matrix.os }}-opencv"
-          ver="${{ fromJson(github.event.inputs.ver-info).ubuntu }}"
+          ver="${{ fromJson(github.event.inputs.ver-info).opencv }}"
           python3 .github/scripts/prebuild_tools/install_opencv.py \
             --platform linux --version $ver
       # - name: download-onnxruntime
@@ -317,12 +317,12 @@ jobs:
       - linux-x86_64_prepare_cpu
       - linux-x86_64_prepare_cuda
       - linux-x86_64_build_matrix
+    if: ${{ github.event.inputs.target-backends-cuda != 'none' }}
     strategy:
       matrix:
         os: ${{ fromJSON(needs.linux-x86_64_build_matrix.outputs.os) }}
         cuda: ${{ fromJSON(needs.linux-x86_64_build_matrix.outputs.cuda) }}
     runs-on: ${{ matrix.os }}
-    if: ${{ github.event.inputs.target-backends-cuda != 'none' }}
     steps:
       - name: download-pplcv
         uses: actions/download-artifact@v3
