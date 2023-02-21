@@ -236,7 +236,8 @@ jobs:
               }
               core.setOutput('device', DEVICE)
               var OS = "${{ fromJson(github.event.inputs.ver-info).ubuntu }}"
-              core.setOutput('os', OS.split(';'))
+              OS = OS.split(";").map(v => "ubuntu-" + v)
+              core.setOutput('os', OS)
               var CUDA = "${{ fromJson(github.event.inputs.ver-info).cuda }}"
               core.setOutput('cuda', CUDA.split(';'))
             }
@@ -247,7 +248,7 @@ jobs:
     strategy:
       matrix:
         os: ${{ fromJSON(needs.linux-x86_64_build_matrix.outputs.os) }}
-    runs-on: ubuntu-${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
     steps:
       - name: build-opencv
         run: |
@@ -271,7 +272,7 @@ jobs:
       matrix:
         os: ${{ fromJSON(needs.linux-x86_64_build_matrix.outputs.os) }}
         cuda: ${{ fromJSON(needs.linux-x86_64_build_matrix.outputs.cuda) }}
-    runs-on: ubuntu-${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
     steps:
       - name: build-pplcv
         run: |
@@ -289,7 +290,7 @@ jobs:
     strategy:
       matrix:
         os: ${{ fromJSON(needs.linux-x86_64_build_matrix.outputs.os) }}
-    runs-on: ubuntu-${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
     steps:
       - name: download-opencv
         uses: actions/download-artifact@v3
@@ -314,7 +315,7 @@ jobs:
       matrix:
         os: ${{ fromJSON(needs.linux-x86_64_build_matrix.outputs.os) }}
         cuda: ${{ fromJSON(needs.linux-x86_64_build_matrix.outputs.cuda) }}
-    runs-on: ubuntu-${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
     if: ${{ github.event.inputs.target-backends-cuda != 'none' }}
     steps:
       - name: download-pplcv
