@@ -17,21 +17,20 @@ on:
         description: 'Target backends for cpu (none to skip)'
         type: string
         required: false
-        default: 'ort;openvino;ncnn'
+        default: 'ort;openvino'
       target-backends-cuda:
         description: 'Target backends for cuda (none to skip)'
         type: string
         required: false
-        default: 'ort;trt;ncnn'
+        default: 'ort;trt'
       ver-info:
         description: 'Version setting'
         type: string
         required: true
         default: '{
           "opencv": "4.5.5",
-          "pplcv": "0.7.1",
+          "pplcv": "0.7.0",
           "onnxruntime": "1.8.1",
-          "ncnn": "20221128",
           "openvino": "2022.2",
           "tensorrt": "8.2.3.0",
           "cudnn": "8.2.1",
@@ -248,7 +247,7 @@ jobs:
     strategy:
       matrix:
         os: ${{ fromJSON(needs.linux-x86_64_build_matrix.outputs.os) }}
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-${{ matrix.os }}
     steps:
       - name: build-opencv
         run: |
@@ -266,7 +265,7 @@ jobs:
       matrix:
         os: ${{ fromJSON(needs.linux-x86_64_build_matrix.outputs.os) }}
         cuda: ${{ fromJSON(needs.linux-x86_64_build_matrix.outputs.cuda) }}
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-${{ matrix.os }}
     steps:
       - name: build-pplcv
         run: |
@@ -283,7 +282,7 @@ jobs:
     strategy:
       matrix:
         os: ${{ fromJSON(needs.linux-x86_64_build_matrix.outputs.os) }}
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-${{ matrix.os }}
     steps:
       - name: download-opencv
         uses: actions/download-artifact@v3
@@ -304,7 +303,7 @@ jobs:
       matrix:
         os: ${{ fromJSON(needs.linux-x86_64_build_matrix.outputs.os) }}
         cuda: ${{ fromJSON(needs.linux-x86_64_build_matrix.outputs.cuda) }}
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-${{ matrix.os }}
     steps:
       - name: download-pplcv
         uses: actions/download-artifact@v3
