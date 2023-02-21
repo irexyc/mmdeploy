@@ -55,7 +55,7 @@ def remove_noused(dst_folder):
             safe_call(f'rm -rf {f}')
 
 
-def build(args):
+def run(args):
     os.chdir(args.work_dir)
     url = URLS[args.platform][args.device][args.version]
     local_file = os.path.basename(url)
@@ -67,7 +67,7 @@ def build(args):
 
 def main():
     args = parse_args()
-    build(args)
+    run(args)
 
 
 if __name__ == '__main__':

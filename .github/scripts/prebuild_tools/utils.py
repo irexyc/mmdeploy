@@ -12,7 +12,7 @@ def safe_call(cmd):
 
 def extract(src, dst):
     os.mkdir(dst)
-    if sys.platform == 'darwin':
+    if sys.platform == 'linux':
         safe_call(f'tar xf {src} -C {dst}')
     elif sys.platform == 'win32':
         pass
