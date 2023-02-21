@@ -260,16 +260,14 @@ jobs:
           # ver="${{ fromJson(github.event.inputs.ver-info).opencv }}"
           # python3 .github/scripts/prebuild_tools/install_opencv.py \
           #   --platform linux --version $ver
-          pwd
+          mkdir -p artifact/opencv/build/install/opencv-files
           ls -lh
-          mkdir -p opencv/build/install/opencv-files
       - name: upload-opencv
         uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.os }}-opencv
-          path: artifact/opencv/build/install
+          path: ${{ github.workspace }}/artifact/opencv/build/install
       - name: download-onnxruntime
-        working-directory: ${{ github.workspace }}/artifact
         run: |
           ver="${{ fromJson(github.event.inputs.ver-info).onnxruntime }}"
           python3 .github/scripts/prebuild_tools/install_onnxruntime.py \
