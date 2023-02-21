@@ -1,6 +1,13 @@
 import os
 import argparse
+import subprocess
+import sys
 
+
+def safe_call(cmd):
+    code = os.WEXITSTATUS(os.system(cmd))
+    if code != 0:
+        sys.exit(code)
 
 def parse_args():
     parser = argparse.ArgumentParser(
@@ -20,16 +27,24 @@ def build(args):
     if args.platform == 'win32':
         pass
     elif args.platform == 'linux':
-        cmd = '''cmake .. \
-                    -DOPENCV_FORCE_3RDPARTY_BUILD=ON \
-                    -DBUILD_TESTS=OFF -DBUILD_PERF_TESTS=OFF \
-                    -DBUILD_SHARED_LIBS=OFF \
-                    -DBUILD_JAVA=OFF \
-                    -DBUILD_opencv_python3=OFF \
-                    -DBUILD_opencv_python2=OFF
-              '''
-    os.system('sdf')
+        cmd = '''
+            cmake .. \
+                -DOPENCV_FORCE_3RDPARTY_BUILD=ON \
+               -DBUILD_TESTS=OFF-DBUILD_PERF_TESTS=OFF \
+               -DBUILD_SHARED_LIBS=OFF \
+               -DBUILD_JAVA=OFF \
+               -DBUILD_opencv_python3=OFF \
+               -DBUILD_opencv_python2=OFF \
+               -DWITH_FFMPEG=OFF \
+               -DCMAKE_INSTALL_PREFIX=install
+        '''
 
+    safe_call('sdfs')
+    safe_call('mkdir build')
+    safe_call('cd build')
+    safe_call(cmd)
+    safe_call('cmake --build . --config Release -j')
+    safe_call('cmake --install . --config Release')
 
 def main():
     args = parse_args()
