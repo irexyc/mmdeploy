@@ -285,6 +285,7 @@ jobs:
   linux-x86_64_build_cpu:
     name: build_cpu
     needs: [linux-x86_64_prepare_cpu, linux-x86_64_build_matrix]
+    if: ${{ github.event.inputs.target-backends-cpu != 'none' }}
     strategy:
       matrix:
         os: ${{ fromJSON(needs.linux-x86_64_build_matrix.outputs.os) }}
@@ -314,6 +315,7 @@ jobs:
         os: ${{ fromJSON(needs.linux-x86_64_build_matrix.outputs.os) }}
         cuda: ${{ fromJSON(needs.linux-x86_64_build_matrix.outputs.cuda) }}
     runs-on: ubuntu-${{ matrix.os }}
+    if: ${{ github.event.inputs.target-backends-cuda != 'none' }}
     steps:
       - name: download-pplcv
         uses: actions/download-artifact@v3
