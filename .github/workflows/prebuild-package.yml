@@ -255,7 +255,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
       - name: build-opencv
-        working-directory: ${{ github.workspace }}/artifact
         run: |
           echo "build opencv" > "${{ matrix.os }}-opencv"
           # ver="${{ fromJson(github.event.inputs.ver-info).opencv }}"
