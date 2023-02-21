@@ -60,8 +60,9 @@ def run(args):
     request.urlretrieve(url, local_file)
     dst_folder = 'openvino'
     extract(local_file, dst_folder)
-    remove_noused(dst_folder)
     os.remove(local_file)
+    remove_noused(dst_folder)
+
 
 def main():
     args = parse_args()
