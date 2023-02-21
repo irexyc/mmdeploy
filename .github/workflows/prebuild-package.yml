@@ -88,12 +88,15 @@ jobs:
           # python3 .github/scripts/prebuild_tools/install_opencv.py \
           #   --platform linux --version $ver
           mkdir -p artifact/opencv/build/install/opencv-files
+          touch artifact/opencv/build/install/file
+          cd artifact/opencv/build/install/opencv-files
+          pwd
           ls -lh
       - name: upload-opencv
         uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.os }}-opencv
-          path: ${{ github.workspace }}/artifact/opencv/build/install/*
+          path: ${{ github.workspace }}/artifact/opencv/build/install
 
   linux-x86_64_prepare_cuda:
     name: prepare_cuda
