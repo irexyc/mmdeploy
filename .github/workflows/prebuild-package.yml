@@ -255,7 +255,9 @@ jobs:
       - name: build-opencv
         run: |
           echo "build opencv" > "${{ matrix.os }}-opencv"
-          python3 .github/scripts/prebuild_tools/install_opencv.py
+          ver="${{ fromJson(github.event.inputs.ver-info).ubuntu }}"
+          python3 .github/scripts/prebuild_tools/install_opencv.py \
+            --platform linux --version $ver
       # - name: download-onnxruntime
       #   run: |
       #     ls
@@ -271,6 +273,7 @@ jobs:
   linux-x86_64_prepare_cuda:
     name: prepare_cuda
     needs: linux-x86_64_build_matrix
+    if: ${{ github.event.inputs.target-backends-cuda != 'none' }}
     strategy:
       matrix:
         os: ${{ fromJSON(needs.linux-x86_64_build_matrix.outputs.os) }}
