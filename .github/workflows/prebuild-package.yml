@@ -255,7 +255,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
       - name: build-opencv
-        working-directory: artifact
+        working-directory: ${{ github.workspace }}/artifact
         run: |
           echo "build opencv" > "${{ matrix.os }}-opencv"
           # ver="${{ fromJson(github.event.inputs.ver-info).opencv }}"
@@ -268,7 +268,7 @@ jobs:
           name: ${{ matrix.os }}-opencv
           path: artifact/opencv/build/install
       - name: download-onnxruntime
-        working-directory: artifact
+        working-directory: ${{ github.workspace }}/artifact
         run: |
           ver="${{ fromJson(github.event.inputs.ver-info).onnxruntime }}"
           python3 .github/scripts/prebuild_tools/install_onnxruntime.py \
