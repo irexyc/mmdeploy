@@ -36,7 +36,7 @@ on:
           "tensorrt": "8.2.3.0",
           "cudnn": "8.2.1",
           "cuda": "10.2;11.1",
-          "ubuntu": "18.04;20.04;22.04"
+          "ubuntu": "18.04"
         }'
 
 concurrency:
@@ -231,10 +231,7 @@ jobs:
         with:
           script: |
             if (context.eventName === "workflow_dispatch") {
-              DEVICE = []
-              if ("${{ github.event.inputs.target-backends-cpu }}" != "") {
-                DEVICE.push("cpu")
-              }
+              DEVICE = ["cpu"]
               if ("${{ github.event.inputs.target-backends-cuda }}" != "") {
                 DEVICE.push("cuda")
               }
@@ -242,65 +239,144 @@ jobs:
               var OS = "${{ fromJson(github.event.inputs.ver-info).ubuntu }}"
               core.setOutput('os', OS.split(';'))
               var CUDA = "${{ fromJson(github.event.inputs.ver-info).cuda }}"
-              core.setOutput('cuda', OS.split(';'))
-              console.log(OS)
-              console.log(CUDA)
+              core.setOutput('cuda', CUDA.split(';'))
             }
 
-  linux-x86_64_prepare:
-    name: prepare
+  linux-x86_64_prepare_cpu:
+    name: prepare_cpu
     needs: linux-x86_64_build_matrix
     strategy:
       matrix:
-        os: [ubuntu-18.04, ubuntu-20.04, ubuntu-22.04]
-        device: ${{ fromJSON(needs.linux-x86_64_build_matrix.outputs.device) }}
+        os: ${{ fromJSON(needs.linux-x86_64_build_matrix.outputs.os) }}
     runs-on: ${{ matrix.os }}
     steps:
       - name: build-opencv
-        if: ${{ matrix.device == 'cpu' }}
-        id: build-opencv
         run: |
           echo "build opencv" > "${{ matrix.os }}-opencv"
       - name: Upload opencv for job
-        if: ${{ matrix.device == 'cpu' }}
         uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.os }}-opencv
           path: ${{ matrix.os }}-opencv
-      - name: build-pplcv
-        if: ${{ matrix.device == 'cuda' }}
-        id: build-pplcv
-        run: |
-          echo "build pplcv" > "${{ matrix.os }}-pplcv"
-      - name: Upload pplcv for job
-        if: ${{ matrix.device == 'cuda' }}
-        uses: actions/upload-artifact@v3
-        with:
-          name: ${{ matrix.os }}-pplcv
-          path: ${{ matrix.os }}-pplcv
 
-  linux-x86-64_build:
-    name: build
-    needs: [linux-x86_64_prepare, linux-x86_64_build_matrix]
+  linux-x86_64_prepare_cuda:
+    name: prepare_cuda
+    needs: linux-x86_64_build_matrix
     strategy:
       matrix:
         os: ${{ fromJSON(needs.linux-x86_64_build_matrix.outputs.os) }}
-        device: ${{ fromJSON(needs.linux-x86_64_build_matrix.outputs.device) }}
+        cuda: ${{ fromJSON(needs.linux-x86_64_build_matrix.outputs.cuda) }}
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: build-pplcv
+        run: |
+          echo "build pplcv" > "${{ matrix.os }}-${{ matrix.cuda }}-pplcv"
+      - name: Upload pplcv for job
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ matrix.os }}-${{ matrix.cuda }}-pplcv
+          path: ${{ matrix.os }}-${{ matrix.cuda }}-pplcv
+
+  linux-x86_64_build_cpu:
+    name: build_cpu
+    needs: [linux-x86_64_prepare_cpu, linux-x86_64_build_matrix]
+    strategy:
+      matrix:
+        os: ${{ fromJSON(needs.linux-x86_64_build_matrix.outputs.os) }}
     runs-on: ${{ matrix.os }}
     steps:
       - name: download-opencv
         uses: actions/download-artifact@v3
         with:
           name: ${{ matrix.os }}-opencv
-      - name: download-pplcv
-        if: ${{ matrix.device == 'cuda' }}
-        uses: actions/download-artifact@v3
-        with:
-          name: ${{ matrix.os }}-pplcv
       - name: Echo
         run: |
           ls
           cat ${{ matrix.os }}-opencv
+
+  linux-x86_64_build_cuda:
+    name: build_cuda
+    needs:
+      - linux-x86_64_prepare_cpu
+      - linux-x86_64_prepare_cuda
+      - linux-x86_64_build_matrix
+    strategy:
+      matrix:
+        os: ${{ fromJSON(needs.linux-x86_64_build_matrix.outputs.os) }}
+        cuda: ${{ fromJSON(needs.linux-x86_64_build_matrix.outputs.cuda) }}
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: download-pplcv
+        uses: actions/download-artifact@v3
+        with:
+          name: ${{ matrix.os }}-${{ matrix.cuda }}-pplcv
+      - name: Echo
+        run: |
+          ls
+          cat ${{ matrix.os }}-${{ matrix.cuda }}-pplcv
+
+
+  # linux-x86_64_prepare:
+  #   name: prepare
+  #   needs: linux-x86_64_build_matrix
+  #   strategy:
+  #     matrix:
+  #       os: ${{ fromJSON(needs.linux-x86_64_build_matrix.outputs.os) }}
+  #       device: ${{ fromJSON(needs.linux-x86_64_build_matrix.outputs.device) }}
+  #   runs-on: ${{ matrix.os }}
+  #   steps:
+  #     - name: build-opencv
+  #       if: ${{ matrix.device == 'cpu' }}
+  #       id: build-opencv
+  #       run: |
+  #         echo "build opencv" > "${{ matrix.os }}-opencv"
+  #     - name: Upload opencv for job
+  #       if: ${{ matrix.device == 'cpu' }}
+  #       uses: actions/upload-artifact@v3
+  #       with:
+  #         name: ${{ matrix.os }}-opencv
+  #         path: ${{ matrix.os }}-opencv
+  #     - name: build-pplcv
+  #       if: ${{ matrix.device == 'cuda' }}
+  #       id: build-pplcv
+  #       run: |
+  #         echo "build pplcv" > "${{ matrix.os }}-pplcv"
+  #     - name: Upload pplcv for job
+  #       if: ${{ matrix.device == 'cuda' }}
+  #       uses: actions/upload-artifact@v3
+  #       with:
+  #         name: ${{ matrix.os }}-pplcv
+  #         path: ${{ matrix.os }}-pplcv
+
+  # linux-x86-64_build:
+  #   name: build
+  #   needs: [linux-x86_64_prepare, linux-x86_64_build_matrix]
+  #   strategy:
+  #     matrix:
+  #       os: ${{ fromJSON(needs.linux-x86_64_build_matrix.outputs.os) }}
+  #       device: ${{ fromJSON(needs.linux-x86_64_build_matrix.outputs.device) }}
+  #   runs-on: ${{ matrix.os }}
+  #   steps:
+  #     - name: download-opencv
+  #       uses: actions/download-artifact@v3
+  #       with:
+  #         name: ${{ matrix.os }}-opencv
+  #     - name: download-pplcv
+  #       if: ${{ matrix.device == 'cuda' }}
+  #       uses: actions/download-artifact@v3
+  #       with:
+  #         name: ${{ matrix.os }}-pplcv
+  #     - name: Echo
+  #       run: |
+  #         ls
+  #         cat ${{ matrix.os }}-opencv
+
+
+
+
+
+
+
 
   # linux-x86-64_deploy:
   #   name: deploy
