@@ -75,7 +75,10 @@ jobs:
     strategy:
       matrix:
         os: ${{ fromJSON(needs.linux-x86_64_build_matrix.outputs.os) }}
-    runs-on: ${{ matrix.os }}
+        include:
+          - os: ubuntu-20.04
+            container: ghcr.io/catthehacker/ubuntu:full-18.04
+    runs-on: ${{ matrix.container }}
     steps:
       - run: |
           mkdir -p ${{ github.workspace }}/artifact
