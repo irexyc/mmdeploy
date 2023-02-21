@@ -96,7 +96,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.os }}-opencv
-          path: ${{ github.workspace }}/artifact/opencv/build/install
+          path: ${{ github.workspace }}/artifact/opencv/build/install/**/*
 
   linux-x86_64_prepare_cuda:
     name: prepare_cuda
