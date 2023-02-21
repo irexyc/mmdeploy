@@ -35,7 +35,7 @@ on:
           "tensorrt": "8.2.3.0",
           "cudnn": "8.2.1",
           "cuda": "10.2;11.1",
-          "ubuntu": "18.04"
+          "ubuntu": "20.04"
         }'
 
 concurrency:
