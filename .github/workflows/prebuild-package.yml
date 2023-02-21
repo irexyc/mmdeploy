@@ -250,6 +250,8 @@ jobs:
         os: ${{ fromJSON(needs.linux-x86_64_build_matrix.outputs.os) }}
     runs-on: ${{ matrix.os }}
     steps:
+      - run: |
+          mkdir -p ${{ github.workspace }}/artifact
       - name: Checkout repository
         uses: actions/checkout@v3
       - name: build-opencv
