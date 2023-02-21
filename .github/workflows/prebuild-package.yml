@@ -164,13 +164,43 @@ jobs:
         cuda: ${{ fromJSON(needs.linux-x86_64_build_matrix.outputs.cuda) }}
     runs-on: ${{ matrix.os }}
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          submodules: 'recursive'
       - name: download-pplcv
         uses: actions/download-artifact@v3
         with:
           name: ${{ matrix.os }}-cuda${{ matrix.cuda }}-pplcv
+          path: ../third_party
+      - name: download-opencv
+        uses: actions/download-artifact@v3
+        with:
+          name: ${{ matrix.os }}-opencv
+          path: ../third_party
+      - name: download-tensorrt
+        if: contains(${{ inputs.target-backends-cuda }}, 'trt')
+        run: |
+          ver="${{ fromJson(inputs.ver-info).tensorrt }}"
+          cuda="${{ matrix.cuda }}"
+          python3 .github/scripts/prebuild_tools/install_tensorrt.py \
+            --platform linux --version $ver --work-dir ../third_party --cuda $cuda
+      - name: download-cudnn
+        if: contains(${{ inputs.target-backends-cuda }}, 'trt')
+        run: |
+          ver="${{ fromJson(inputs.ver-info).cudnn }}"
+          cuda="${{ matrix.cuda }}"
+          python3 .github/scripts/prebuild_tools/install_cudnn.py \
+            --platform linux --version $ver --work-dir ../third_party --cuda $cuda
+      - name: download-onnxruntime
+        if: contains(${{ inputs.target-backends-cuda }}, 'ort')
+        run: |
+          ver="${{ fromJson(inputs.ver-info).onnxruntime }}"
+          python3 .github/scripts/prebuild_tools/install_onnxruntime.py \
+            --platform linux --version $ver --work-dir ../third_party --device cuda
       - name: Echo
         run: |
-          ls
+          ls ../third_parth
           cat ${{ matrix.os }}-cuda${{ matrix.cuda }}-pplcv
 
 
@@ -205,3 +235,4 @@ jobs:
 
   # https://docs.github.com/en/actions/using-workflows/storing-workflow-data-as-artifacts
   # https://dev.to/n3wt0n/github-composite-actions-nest-actions-within-actions-3e5l
+  # https://github.com/catthehacker/docker_images
