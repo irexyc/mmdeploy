@@ -4,14 +4,24 @@ import subprocess
 import sys
 
 URLS = {
-    'linux': {
-        'cpu': {
-            '1.8.1': ''
-        }
-    },
     'windows': {
         'cpu': {
-            '1.8.1': ''
+            '1.8.1': 'https://github.com/microsoft/onnxruntime/releases/download/v1.8.1/onnxruntime-win-x64-1.8.1.zip',
+            '1.14.0': 'https://github.com/microsoft/onnxruntime/releases/download/v1.14.0/onnxruntime-win-x64-1.14.0.zip',
+        },
+        'cuda': {
+            '1.8.1': 'https://github.com/microsoft/onnxruntime/releases/download/v1.8.1/onnxruntime-win-gpu-x64-1.8.1.zip',
+            '1.14.0': 'https://github.com/microsoft/onnxruntime/releases/download/v1.14.0/onnxruntime-win-x64-gpu-1.14.0.zip',
+        }
+    },
+    'linux': {
+        'cpu': {
+            '1.8.1': 'https://github.com/microsoft/onnxruntime/releases/download/v1.8.1/onnxruntime-linux-x64-1.8.1.tgz',
+            '1.14.0': 'https://github.com/microsoft/onnxruntime/releases/download/v1.14.0/onnxruntime-linux-x64-1.14.0.tgz',
+        },
+        'cuda': {
+            '1.8.1': 'https://github.com/microsoft/onnxruntime/releases/download/v1.8.1/onnxruntime-linux-x64-gpu-1.8.1.tgz',
+            '1.14.0': 'https://github.com/microsoft/onnxruntime/releases/download/v1.14.0/onnxruntime-linux-x64-gpu-1.14.0.tgz',
         }
     }
 }
@@ -42,6 +52,7 @@ def parse_args():
 def build(args):
     os.chdir(args.work_dir)
 
+    url = URLS['abc']
 
 def main():
     args = parse_args()
