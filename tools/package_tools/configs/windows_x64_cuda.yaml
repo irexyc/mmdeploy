@@ -1,0 +1,19 @@
+global_config:
+  cmake_flags: ['-A x64 -T v142,cuda="%CUDA_PATH%"']
+  cmake_envs:
+    MMDEPLOY_BUILD_SDK: "ON"
+    MMDEPLOY_BUILD_SDK_MONOLITHIC: "ON"
+    MMDEPLOY_BUILD_EXAMPLES: "OFF"
+    MMDEPLOY_SHARED_LIBS: "OFF"
+    MMDEPLOY_CODEBASES: "all"
+    OpenCV_DIR: "%OpenCV_DIR%"
+
+local_configs:
+  - BUILD_NAME: "mmdeploy-{mmdeploy_v}-{system}-{machine}-cuda{cuda_v}"
+    cmake_envs:
+      MMDEPLOY_TARGET_DEVICES: '"cuda"'
+      MMDEPLOY_TARGET_BACKENDS: "%MMDEPLOY_TARGET_BACKENDS%"
+      pplcv_DIR: "%PPLCV_DIR%"
+      TENSORRT_DIR: "%TENSORRT_DIR%"
+      CUDNN_DIR: "%CUDNN_DIR%"
+      ONNXRUNTIME_DIR: "%ONNXRUNTIME_DIR%"

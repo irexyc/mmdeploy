@@ -57,7 +57,7 @@ def _copy(src_path, dst_path):
     if osp.isdir(src_path):
         if osp.exists(dst_path):
             shutil.rmtree(dst_path)
-        shutil.copytree(src_path, dst_path)
+        shutil.copytree(src_path, dst_path, symlinks=True)
     else:
         shutil.copy(src_path, dst_path)
 

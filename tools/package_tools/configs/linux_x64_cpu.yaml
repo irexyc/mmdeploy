@@ -1,0 +1,16 @@
+global_config:
+  cmake_envs:
+    # CMAKE_CXX_COMPILER: "g++-7"
+    MMDEPLOY_BUILD_SDK: "ON"
+    MMDEPLOY_BUILD_SDK_MONOLITHIC: "ON"
+    MMDEPLOY_BUILD_EXAMPLES: "OFF"
+    MMDEPLOY_SHARED_LIBS: "OFF"
+    OpenCV_DIR: "${OpenCV_DIR}"
+
+local_configs:
+  - BUILD_NAME: "mmdeploy-{mmdeploy_v}-{system}-{machine}-cpu"
+    cmake_envs:
+      MMDEPLOY_TARGET_DEVICES: '"cpu"'
+      MMDEPLOY_TARGET_BACKENDS: "${MMDEPLOY_TARGET_BACKENDS}"
+      ONNXRUNTIME_DIR: "${ONNXRUNTIME_DIR}"
+      InferenceEngine_DIR: "${InferenceEngine_DIR}"

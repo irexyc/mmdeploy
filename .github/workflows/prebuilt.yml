@@ -1,0 +1,266 @@
+name: prebuilt
+
+on:
+  workflow_dispatch:
+    inputs:
+      build-for-win10:
+        description: 'Build for Windows amd64'
+        required: true
+        type: boolean
+        default: true
+      build-for-linux:
+        required: true
+        description: 'Build for Linux x86_64'
+        type: boolean
+        default: false
+      target-backends-cpu:
+        description: 'Target backends for cpu (none to skip)'
+        type: string
+        required: false
+        default: 'ort'
+      target-backends-cuda:
+        description: 'Target backends for cuda (none to skip)'
+        type: string
+        required: false
+        default: 'ort'
+      ver-info:
+        description: 'Version setting'
+        type: string
+        required: true
+        default: '{
+          "opencv": "4.5.5",
+          "pplcv": "0.7.0",
+          "onnxruntime": "1.8.1",
+          "openvino": "2022.2",
+          "tensorrt": "8.2.3.0",
+          "cudnn": "8.2.1",
+          "ubuntu": "18.04"
+        }'
+
+jobs:
+  linux-x86_64_cpu_build:
+    runs-on: ubuntu-20.04
+    if: (inputs.build-for-linux == true) && (inputs.target-backends-cpu != 'none')
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          submodules: 'recursive'
+      - name: Install third-party
+        run: |
+          python3 .github/scripts/install_dependencies.py \
+            --device cpu \
+            --backends "${{ inputs.target-backends-cpu }}" \
+            --work-dir ../third_party \
+            --platform linux \
+            --verinfo '${{ inputs.ver-info }}' \
+            --ubuntu '${{ fromJSON(inputs.ver-info).ubuntu }}'
+          python3 .github/scripts/generate_env.py \
+            --third-party-dir ../third_party \
+            --platform linux \
+            --out envfile
+      - uses: conda-incubator/setup-miniconda@v2
+      - name: Create python environment
+        shell: bash -el {0}
+        run: |
+          conda create -n mmdeploy-3.6 python=3.6
+          conda create -n mmdeploy-3.7 python=3.7
+          conda create -n mmdeploy-3.8 python=3.8
+          conda create -n mmdeploy-3.9 python=3.9
+          conda activate mmdeploy-3.6
+          pip install pyyaml packaging
+      - name: Build mmdeploy
+        shell: bash -el {0}
+        id: build
+        run: |
+          export MMDEPLOY_THIRD_PARTY_ROOT="${{ github.workspace }}/../third_party"
+          export MMDEPLOY_TARGET_BACKENDS="${{ inputs.target-backends-cpu }}"
+          source envfile
+          conda activate mmdeploy-3.6
+          mkdir pack && cd pack
+          python ../tools/package_tools/mmdeploy_builder.py \
+            ../tools/package_tools/configs/linux_x64_cpu.yaml ..
+          pkgname=$(ls)
+          tar czf "$pkgname.tar.gz" $pkgname
+          echo "pkgname=$pkgname.tar.gz" >> $GITHUB_OUTPUT
+          echo "pkgpath=$(pwd)/$pkgname.tar.gz" >> $GITHUB_OUTPUT
+      - uses: actions/upload-artifact@v3
+        with:
+          name: ${{ steps.build.outputs.pkgname }}
+          path: ${{ steps.build.outputs.pkgpath }}
+
+  linux-x86_64_cu111_build:
+    runs-on: ubuntu-20.04
+    if: (inputs.build-for-linux == true) && (inputs.target-backends-cuda != 'none')
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          submodules: 'recursive'
+      - name: Install CUDA
+        uses: Jimver/cuda-toolkit@v0.2.8
+        with:
+          cuda: "11.1.1"
+      - name: Install third-party
+        run: |
+          python3 .github/scripts/install_dependencies.py \
+            --device cuda \
+            --backends "${{ inputs.target-backends-cuda }}" \
+            --work-dir ../third_party \
+            --platform linux \
+            --verinfo '${{ inputs.ver-info }}' \
+            --ubuntu '${{ fromJSON(inputs.ver-info).ubuntu }}' \
+            --cuda '11.1.1'
+          python3 .github/scripts/generate_env.py \
+            --third-party-dir ../third_party \
+            --platform linux \
+            --out envfile
+      - uses: conda-incubator/setup-miniconda@v2
+      - name: Create python environment
+        shell: bash -el {0}
+        run: |
+          conda create -n mmdeploy-3.6 python=3.6
+          conda create -n mmdeploy-3.7 python=3.7
+          conda create -n mmdeploy-3.8 python=3.8
+          conda create -n mmdeploy-3.9 python=3.9
+          conda activate mmdeploy-3.6
+          pip install pyyaml packaging
+      - name: Build mmdeploy
+        shell: bash -el {0}
+        id: build
+        run: |
+          export CUDA_TOOLKIT_ROOT_DIR=$CUDA_PATH
+          export MMDEPLOY_THIRD_PARTY_ROOT="${{ github.workspace }}/../third_party"
+          export MMDEPLOY_TARGET_BACKENDS="${{ inputs.target-backends-cuda }}"
+          source envfile
+          conda activate mmdeploy-3.6
+          mkdir pack && cd pack
+          python ../tools/package_tools/mmdeploy_builder.py \
+            ../tools/package_tools/configs/linux_x64_cuda.yaml ..
+          pkgname=$(ls)
+          tar czf "$pkgname.tar.gz" $pkgname
+          echo "pkgname=$pkgname.tar.gz" >> $GITHUB_OUTPUT
+          echo "pkgpath=$(pwd)/$pkgname.tar.gz" >> $GITHUB_OUTPUT
+      - uses: actions/upload-artifact@v3
+        with:
+          name: ${{ steps.build.outputs.pkgname }}
+          path: ${{ steps.build.outputs.pkgpath }}
+
+  windows-amd64_cpu_build:
+    runs-on: windows-2022
+    if: (inputs.build-for-win10 == true) && (inputs.target-backends-cpu != 'none')
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          submodules: 'recursive'
+      - name: Install third-party
+        run: |
+          $ver = '${{ inputs.ver-info }}'
+          $ver = $ver.replace('"', '\"').replace("'", "")
+          python3 .github/scripts/install_dependencies.py `
+            --device cpu `
+            --backends "${{ inputs.target-backends-cpu }}" `
+            --work-dir ../third_party `
+            --platform windows `
+            --verinfo $ver
+          python3 .github/scripts/generate_env.py `
+            --third-party-dir ../third_party `
+            --platform windows `
+            --out envfile.ps1
+      - uses: conda-incubator/setup-miniconda@v2
+      - name: Create python environment
+        run: |
+          conda create -n mmdeploy-3.6 python=3.6
+          conda create -n mmdeploy-3.7 python=3.7
+          conda create -n mmdeploy-3.8 python=3.8
+          conda create -n mmdeploy-3.9 python=3.9
+          conda activate mmdeploy-3.6
+          pip install pyyaml packaging
+      - name: Build mmdeploy
+        run: |
+          $env:MMDEPLOY_THIRD_PARTY_ROOT=[IO.Path]::Combine("$pwd", "..", "third_party")
+          $env:MMDEPLOY_TARGET_BACKENDS="${{ inputs.target-backends-cpu }}"
+          cat envfile.ps1
+          . .\envfile.ps1
+          conda activate mmdeploy-3.6
+          mkdir pack && cd pack
+          echo $env:ONNXRUNTIME_DIR
+          echo $env:OpenCV_DIR
+          python ../tools/package_tools/mmdeploy_builder.py `
+            ../tools/package_tools/configs/windows_x64_cpu.yaml ..
+      - name: Upload package
+        id: pack
+        run: |
+          cd pack
+          $pkgname=$(ls).Name
+          Compress-Archive -Path $pkgname -DestinationPath "$pkgname.zip"
+          $pkgpath=[IO.Path]::Combine("$pwd", "$pkgname.zip")
+          echo "pkgname=$pkgname" >> $env:GITHUB_OUTPUT
+          echo "pkgpath=$pkgpath" >> $env:GITHUB_OUTPUT
+      - uses: actions/upload-artifact@v3
+        with:
+          name: ${{ steps.pack.outputs.pkgname }}
+          path: ${{ steps.pack.outputs.pkgpath }}
+
+  windows-amd64_cu111_build:
+    runs-on: windows-2022
+    if: (inputs.build-for-win10 == true) && (inputs.target-backends-cuda != 'none')
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          submodules: 'recursive'
+      - name: Install CUDA
+        uses: Jimver/cuda-toolkit@v0.2.8
+        with:
+          cuda: "11.1.1"
+      - name: Install third-party
+        run: |
+          $ver = '${{ inputs.ver-info }}'
+          $ver = $ver.replace('"', '\"').replace("'", "")
+          python3 .github/scripts/install_dependencies.py `
+            --device cuda `
+            --backends "${{ inputs.target-backends-cuda }}" `
+            --work-dir ../third_party `
+            --platform windows `
+            --verinfo $ver `
+            --cuda "11.1.1"
+          python3 .github/scripts/generate_env.py `
+            --third-party-dir ../third_party `
+            --platform windows `
+            --out envfile.ps1
+      - uses: conda-incubator/setup-miniconda@v2
+      - name: Create python environment
+        run: |
+          conda create -n mmdeploy-3.6 python=3.6
+          conda create -n mmdeploy-3.7 python=3.7
+          conda create -n mmdeploy-3.8 python=3.8
+          conda create -n mmdeploy-3.9 python=3.9
+          conda activate mmdeploy-3.6
+          pip install pyyaml packaging
+      - name: Build mmdeploy
+        run: |
+          $env:MMDEPLOY_THIRD_PARTY_ROOT=[IO.Path]::Combine("$pwd", "..", "third_party")
+          $env:MMDEPLOY_TARGET_BACKENDS="${{ inputs.target-backends-cuda }}"
+          cat envfile.ps1
+          . .\envfile.ps1
+          conda activate mmdeploy-3.6
+          mkdir pack && cd pack
+          echo $env:ONNXRUNTIME_DIR
+          echo $env:OpenCV_DIR
+          python ../tools/package_tools/mmdeploy_builder.py `
+            ../tools/package_tools/configs/windows_x64_cuda.yaml ..
+      - name: Upload package
+        id: pack
+        run: |
+          cd pack
+          $pkgname=$(ls).Name
+          Compress-Archive -Path $pkgname -DestinationPath "$pkgname.zip"
+          $pkgpath=[IO.Path]::Combine("$pwd", "$pkgname.zip")
+          echo "pkgname=$pkgname" >> $env:GITHUB_OUTPUT
+          echo "pkgpath=$pkgpath" >> $env:GITHUB_OUTPUT
+      - uses: actions/upload-artifact@v3
+        with:
+          name: ${{ steps.pack.outputs.pkgname }}
+          path: ${{ steps.pack.outputs.pkgpath }}
