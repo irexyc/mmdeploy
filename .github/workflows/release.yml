@@ -17,7 +17,6 @@ jobs:
     steps:
       - name: upload
         uses: softprops/action-gh-release@v1
-        if: startsWith(github.ref, 'refs/tags/v')
         with:
           files: |
             hello.txt
