@@ -8,12 +8,19 @@ jobs:
   build:
     runs-on: ubuntu-20.04
     steps:
+      - run: |
+          pwd
+          ls -lh
       - run: echo "hello world" > hello.txt
 
   upload:
     runs-on: ubuntu-20.04
+    environment: 'prod'
     needs: build
     steps:
+      - run: |
+          pws
+          ls -lh
       - name: upload
         uses: softprops/action-gh-release@v1
         with:
