@@ -1,0 +1,33 @@
+name: release
+
+on:
+  pull_request:
+    branches:
+      - main
+      - dev-1.x
+    types:
+      - opened
+    paths:
+      - 'mmdeploy/version.py'
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    steps:
+      - run: echo "hello world" > hello.txt
+
+  upload:
+    runs-on: ubuntu-20.04
+    environment: 'prod'
+    needs: build
+    steps:
+      - name: upload
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            hello.txt
+
+
+# https://cloudlumberjack.com/posts/github-actions-approvals/
+# https://github.com/community/community/discussions/10699
+# https://stackoverflow.com/questions/71688092/how-to-get-the-title-of-a-pull-request-with-github-actions
