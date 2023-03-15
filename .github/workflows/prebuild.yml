@@ -3,10 +3,10 @@ name: prebuild
 on:
   push:
     paths:
-      - "mmdeploy/version.py"
+      - ".github/workflows/prebuild.yml"
   pull_request:
     paths:
-      - "mmdeploy/version.py"
+      - ".github/workflows/prebuild.yml"
 
 permissions: write-all
 
@@ -202,13 +202,16 @@ jobs:
           files: |
               D:/DEPS/ciartifact/${{github.run_id}}/sdk/*.zip
 
-  jetson_4-6_build:
+  jetson_4_6_build:
     runs-on: [self-hosted, jetson-agx]
     container:
       image: irexyc/mmdeploy-base:jetpack-4.6
       options: "--gpus=all --ipc=host"
       volumes:
         - /data/actions-runner/prebuild:/__w/mmdeploy/prebuild
+    defaults:
+      run:
+        shell: bash
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -220,16 +223,16 @@ jobs:
           pip install pyyaml packaging setuptools wheel
           mkdir pack; cd pack
           python ../tools/package_tools/generate_build_config.py --backend 'trt' \
-            --system jetson --output config.yml --build-mmdeploy --cudnn-dir=/usr/local/cuda
-          python ../tools/package_tools/mmdeploy_builder.py --config config.yml
+            --system jetson --output /tmp/config.yml --build-mmdeploy --cudnn-dir=/usr/local/cuda
+          python ../tools/package_tools/mmdeploy_builder.py --config /tmp/config.yml
       - name: Build sdk cuda backend
         run: |
           source activate mmdeploy-3.6
           cd pack
           python ../tools/package_tools/generate_build_config.py --backend 'trt' \
-            --system jetson --output config.yml --device cuda --build-sdk --build-sdk-monolithic \
+            --system jetson --output /tmp/config.yml --device cuda --build-sdk --build-sdk-monolithic \
             --build-sdk-python --sdk-dynamic-net --cudnn-dir=/usr/local --jetpack-version 4.6
-          python ../tools/package_tools/mmdeploy_builder.py --config config.yml
+          python ../tools/package_tools/mmdeploy_builder.py --config /tmp/config.yml
       - name: Move artifact
         run: |
           mkdir /__w/mmdeploy/prebuild/$GITHUB_RUN_ID

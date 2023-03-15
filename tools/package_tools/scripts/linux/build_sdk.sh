@@ -17,8 +17,19 @@ fi
 
 if [ -z "$OPENCV_DIR" ]; then
     # search thirdparty
-    OPENCV_DIR="${WORKSPACE}/thirdparty/opencv/install/lib64/cmake/opencv4"
-    if [ ! -d "$OPENCV_DIR" ]; then
+    _find=false
+    _candidate=('lib64/cmake/opencv4' 'lib/cmake/opencv4')
+    _len=${#_candidate[@]}
+    for (( i=0; i<${_len}; i++ )); do
+        OPENCV_DIR="${WORKSPACE}/thirdparty/opencv/install/${_candidate[$i]}"
+	echo $OPENCV_DIR
+	if [ -d "${OPENCV_DIR}" ]; then
+	    _find=true
+	    break
+        fi
+    done
+
+    if ! $_find; then
         echo "Can't find opencv, please provide OPENCV_DIR or install it by install_opencv.sh"
         exit 1
     fi

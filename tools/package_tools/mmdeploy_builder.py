@@ -225,10 +225,6 @@ def build_mmdeploy(cfg: Dict):
 
 
 def copy_thirdparty(cfg: Dict, sdk_path: str):
-    if cfg['SYSTEM'] == 'jetson':
-        logging.info('Skip copy thirdparty')
-        return
-
     thirdparty_dir = osp.join(sdk_path, 'thirdparty')
     os.mkdir(thirdparty_dir)
 
@@ -261,7 +257,7 @@ def copy_thirdparty(cfg: Dict, sdk_path: str):
         dst_dir = osp.join(thirdparty_dir, 'onnxruntime')
         needed = [('include', '**'), ('lib', '**')]
         _copy_needed(src_dir, dst_dir, needed)
-    if 'trt' in backend:
+    if 'trt' in backend and cfg['SYSTEM'] != 'jetson':
         src_dir = cfg['cmake_cfg']['TENSORRT_DIR']
         dst_dir = osp.join(thirdparty_dir, 'tensorrt')
         needed = [('include', '**'),
