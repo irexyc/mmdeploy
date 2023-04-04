@@ -22,6 +22,9 @@ permissions:
 jobs:
   script_install:
     runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        python-version: [3.7]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
