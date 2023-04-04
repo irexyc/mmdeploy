@@ -65,8 +65,9 @@ def install_pplnn(dep_dir, build_cuda):
         )
 
     os.system('cd python/package && ./build.sh')
+    os.system('breakpoint')
     os.system(
-        'cd /tmp/pyppl-package/dist && python3 -m pip install pyppl*.whl --force-reinstall --user'  # noqa: E501
+        'cd /tmp/pyppl-package/dist && ls -lh && python3 -m pip install pyppl*.whl --force-reinstall --user'  # noqa: E501
     )
 
     pplnn_cmake_dir = os.path.join(pplnn_dir,
