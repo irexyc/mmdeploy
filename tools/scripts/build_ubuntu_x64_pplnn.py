@@ -65,7 +65,7 @@ def install_pplnn(dep_dir, build_cuda):
         )
 
     os.system('cd python/package && ./build.sh')
-    os.system('breakpoint')
+    os.system('echo breakpoint')
     os.system(
         'cd /tmp/pyppl-package/dist && ls -lh && python3 -m pip install pyppl*.whl --force-reinstall --user'  # noqa: E501
     )
