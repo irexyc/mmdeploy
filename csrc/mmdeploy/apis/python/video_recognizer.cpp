@@ -3,6 +3,7 @@
 #include "mmdeploy/video_recognizer.h"
 
 #include "common.h"
+#include "mmdeploy/common.hpp"
 
 namespace mmdeploy::python {
 
@@ -11,6 +12,12 @@ class PyVideoRecognizer {
   PyVideoRecognizer(const char* model_path, const char* device_name, int device_id) {
     auto status =
         mmdeploy_video_recognizer_create_by_path(model_path, device_name, device_id, &recognizer_);
+    if (status != MMDEPLOY_SUCCESS) {
+      throw std::runtime_error("failed to create video_recognizer");
+    }
+  }
+  PyVideoRecognizer(const Model& model, const Context& context) {
+    auto status = mmdeploy_video_recognizer_create_v2(model, context, &recognizer_);
     if (status != MMDEPLOY_SUCCESS) {
       throw std::runtime_error("failed to create video_recognizer");
     }
@@ -79,6 +86,10 @@ static PythonBindingRegisterer register_video_recognizer{[](py::module& m) {
              return std::make_unique<PyVideoRecognizer>(model_path, device_name, device_id);
            }),
            py::arg("model_path"), py::arg("device_name"), py::arg("device_id") = 0)
+      .def(py::init([](const Model& model, const Context& context) {
+             return std::make_unique<PyVideoRecognizer>(model, context);
+           }),
+           py::arg("model"), py::arg("context"))
       .def("__call__",
            [](PyVideoRecognizer* self, const std::vector<PyImage>& imgs,
               const std::pair<int, int>& info) { return self->Apply({imgs}, {info})[0]; })

@@ -3,6 +3,7 @@
 #include "mmdeploy/classifier.h"
 
 #include "common.h"
+#include "mmdeploy/common.hpp"
 
 namespace mmdeploy::python {
 
@@ -15,6 +16,13 @@ class PyClassifier {
       throw std::runtime_error("failed to create classifier");
     }
   }
+  PyClassifier(const Model& model, const Context& context) {
+    auto status = mmdeploy_classifier_create_v2(model, context, &classifier_);
+    if (status != MMDEPLOY_SUCCESS) {
+      throw std::runtime_error("failed to create classifier");
+    }
+  }
+
   ~PyClassifier() {
     mmdeploy_classifier_destroy(classifier_);
     classifier_ = {};
@@ -59,6 +67,10 @@ static PythonBindingRegisterer register_classifier{[](py::module& m) {
              return std::make_unique<PyClassifier>(model_path, device_name, device_id);
            }),
            py::arg("model_path"), py::arg("device_name"), py::arg("device_id") = 0)
+      .def(py::init([](const Model& model, const Context& context) {
+             return std::make_unique<PyClassifier>(model, context);
+           }),
+           py::arg("model"), py::arg("context"))
       .def("__call__",
            [](PyClassifier* self, const PyImage& img) { return self->Apply(std::vector{img})[0]; })
       .def("batch", &PyClassifier::Apply);

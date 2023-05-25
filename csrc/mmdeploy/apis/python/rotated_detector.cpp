@@ -3,6 +3,7 @@
 #include "mmdeploy/rotated_detector.h"
 
 #include "common.h"
+#include "mmdeploy/common.hpp"
 
 namespace mmdeploy::python {
 
@@ -11,6 +12,12 @@ class PyRotatedDetector {
   PyRotatedDetector(const char* model_path, const char* device_name, int device_id) {
     auto status =
         mmdeploy_rotated_detector_create_by_path(model_path, device_name, device_id, &detector_);
+    if (status != MMDEPLOY_SUCCESS) {
+      throw std::runtime_error("failed to create rotated detector");
+    }
+  }
+  PyRotatedDetector(const Model& model, const Context& context) {
+    auto status = mmdeploy_rotated_detector_create_v2(model, context, &detector_);
     if (status != MMDEPLOY_SUCCESS) {
       throw std::runtime_error("failed to create rotated detector");
     }
@@ -67,6 +74,10 @@ static PythonBindingRegisterer register_rotated_detector{[](py::module& m) {
              return std::make_unique<PyRotatedDetector>(model_path, device_name, device_id);
            }),
            py::arg("model_path"), py::arg("device_name"), py::arg("device_id") = 0)
+      .def(py::init([](const Model& model, const Context& context) {
+             return std::make_unique<PyRotatedDetector>(model, context);
+           }),
+           py::arg("model"), py::arg("context"))
       .def("__call__",
            [](PyRotatedDetector* self, const PyImage& img) -> py::tuple {
              return self->Apply(std::vector{img})[0];

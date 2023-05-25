@@ -3,6 +3,7 @@
 #include "mmdeploy/text_recognizer.h"
 
 #include "common.h"
+#include "mmdeploy/common.hpp"
 
 namespace mmdeploy::python {
 
@@ -11,6 +12,12 @@ class PyTextRecognizer {
   PyTextRecognizer(const char* model_path, const char* device_name, int device_id) {
     auto status =
         mmdeploy_text_recognizer_create_by_path(model_path, device_name, device_id, &recognizer_);
+    if (status != MMDEPLOY_SUCCESS) {
+      throw std::runtime_error("failed to create text_recognizer");
+    }
+  }
+  PyTextRecognizer(const Model& model, const Context& context) {
+    auto status = mmdeploy_text_recognizer_create_v2(model, context, &recognizer_);
     if (status != MMDEPLOY_SUCCESS) {
       throw std::runtime_error("failed to create text_recognizer");
     }
@@ -72,6 +79,10 @@ static PythonBindingRegisterer register_text_recognizer{[](py::module& m) {
              return std::make_unique<PyTextRecognizer>(model_path, device_name, device_id);
            }),
            py::arg("model_path"), py::arg("device_name"), py::arg("device_id") = 0)
+      .def(py::init([](const Model& model, const Context& context) {
+             return std::make_unique<PyTextRecognizer>(model, context);
+           }),
+           py::arg("model"), py::arg("context"))
       .def("__call__", [](PyTextRecognizer* self,
                           const PyImage& img) { return self->Apply(std::vector{img})[0]; })
       .def("__call__", [](PyTextRecognizer* self, const PyImage& img,

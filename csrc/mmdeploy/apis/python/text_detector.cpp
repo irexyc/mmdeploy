@@ -3,6 +3,7 @@
 #include "mmdeploy/text_detector.h"
 
 #include "common.h"
+#include "mmdeploy/common.hpp"
 
 namespace mmdeploy::python {
 
@@ -11,6 +12,12 @@ class PyTextDetector {
   PyTextDetector(const char* model_path, const char* device_name, int device_id) {
     auto status =
         mmdeploy_text_detector_create_by_path(model_path, device_name, device_id, &detector_);
+    if (status != MMDEPLOY_SUCCESS) {
+      throw std::runtime_error("failed to create text_detector");
+    }
+  }
+  PyTextDetector(const Model& model, const Context& context) {
+    auto status = mmdeploy_text_detector_create_v2(model, context, &detector_);
     if (status != MMDEPLOY_SUCCESS) {
       throw std::runtime_error("failed to create text_detector");
     }
@@ -61,6 +68,10 @@ static PythonBindingRegisterer register_text_detector{[](py::module& m) {
              return std::make_unique<PyTextDetector>(model_path, device_name, device_id);
            }),
            py::arg("model_path"), py::arg("device_name"), py::arg("device_id") = 0)
+      .def(py::init([](const Model& model, const Context& context) {
+             return std::make_unique<PyTextDetector>(model, context);
+           }),
+           py::arg("model"), py::arg("context"))
       .def("__call__",
            [](PyTextDetector* self, const PyImage& img) -> py::array {
              return self->Apply(std::vector{img})[0];

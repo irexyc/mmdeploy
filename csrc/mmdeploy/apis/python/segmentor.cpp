@@ -3,6 +3,7 @@
 #include "mmdeploy/segmentor.h"
 
 #include "common.h"
+#include "mmdeploy/common.hpp"
 
 namespace mmdeploy::python {
 
@@ -11,6 +12,12 @@ class PySegmentor {
   PySegmentor(const char* model_path, const char* device_name, int device_id) {
     auto status =
         mmdeploy_segmentor_create_by_path(model_path, device_name, device_id, &segmentor_);
+    if (status != MMDEPLOY_SUCCESS) {
+      throw std::runtime_error("failed to create segmentor");
+    }
+  }
+  PySegmentor(const Model& model, const Context& context) {
+    auto status = mmdeploy_segmentor_create_v2(model, context, &segmentor_);
     if (status != MMDEPLOY_SUCCESS) {
       throw std::runtime_error("failed to create segmentor");
     }
@@ -67,6 +74,10 @@ static PythonBindingRegisterer register_segmentor{[](py::module& m) {
              return std::make_unique<PySegmentor>(model_path, device_name, device_id);
            }),
            py::arg("model_path"), py::arg("device_name"), py::arg("device_id") = 0)
+      .def(py::init([](const Model& model, const Context& context) {
+             return std::make_unique<PySegmentor>(model, context);
+           }),
+           py::arg("model"), py::arg("context"))
       .def("__call__",
            [](PySegmentor* self, const PyImage& img) -> py::array {
              return self->Apply(std::vector{img})[0];

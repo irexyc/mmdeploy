@@ -130,6 +130,10 @@ static PythonBindingRegisterer register_pose_tracker{[](py::module& m) {
            }),
            py::arg("det_model"), py::arg("pose_model"), py::arg("device_name"),
            py::arg("device_id") = 0)
+      .def(py::init([](const Model& det_model, const Model& pose_model, const Context& context) {
+             return mmdeploy::PoseTracker(det_model, pose_model, context);
+           }),
+           py::arg("det_model"), py::arg("pose_model"), py::arg("context"))
       .def(
           "__call__",
           [](mmdeploy::PoseTracker* self, mmdeploy::PoseTracker::State* state, const PyImage& img,

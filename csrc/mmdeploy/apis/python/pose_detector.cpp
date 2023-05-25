@@ -6,6 +6,7 @@
 #include <sstream>
 
 #include "common.h"
+#include "mmdeploy/common.hpp"
 
 namespace mmdeploy::python {
 
@@ -20,6 +21,13 @@ class PyPoseDetector {
       throw std::runtime_error("failed to create pose_detector");
     }
   }
+  PyPoseDetector(const Model& model, const Context& context) {
+    auto status = mmdeploy_pose_detector_create_v2(model, context, &detector_);
+    if (status != MMDEPLOY_SUCCESS) {
+      throw std::runtime_error("failed to create pose_detector");
+    }
+  }
+
   py::list Apply(const std::vector<PyImage>& imgs, const std::vector<std::vector<Rect>>& bboxes) {
     if (imgs.size() == 0 && bboxes.size() == 0) {
       return py::list{};
@@ -100,6 +108,10 @@ static PythonBindingRegisterer register_pose_detector{[](py::module& m) {
              return std::make_unique<PyPoseDetector>(model_path, device_name, device_id);
            }),
            py::arg("model_path"), py::arg("device_name"), py::arg("device_id") = 0)
+      .def(py::init([](const Model& model, const Context& context) {
+             return std::make_unique<PyPoseDetector>(model, context);
+           }),
+           py::arg("model"), py::arg("context"))
       .def("__call__",
            [](PyPoseDetector* self, const PyImage& img) -> py::array {
              return self->Apply({img}, {})[0];

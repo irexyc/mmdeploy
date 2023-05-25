@@ -3,6 +3,7 @@
 #include "mmdeploy/restorer.h"
 
 #include "common.h"
+#include "mmdeploy/common.hpp"
 
 namespace mmdeploy::python {
 
@@ -10,6 +11,12 @@ class PyRestorer {
  public:
   PyRestorer(const char* model_path, const char* device_name, int device_id) {
     auto status = mmdeploy_restorer_create_by_path(model_path, device_name, device_id, &restorer_);
+    if (status != MMDEPLOY_SUCCESS) {
+      throw std::runtime_error("failed to create restorer");
+    }
+  }
+  PyRestorer(const Model& model, const Context& context) {
+    auto status = mmdeploy_restorer_create_v2(model, context, &restorer_);
     if (status != MMDEPLOY_SUCCESS) {
       throw std::runtime_error("failed to create restorer");
     }
@@ -56,6 +63,10 @@ static PythonBindingRegisterer register_restorer{[](py::module& m) {
              return std::make_unique<PyRestorer>(model_path, device_name, device_id);
            }),
            py::arg("model_path"), py::arg("device_name"), py::arg("device_id") = 0)
+      .def(py::init([](const Model& model, const Context& context) {
+             return std::make_unique<PyRestorer>(model, context);
+           }),
+           py::arg("model"), py::arg("context"))
       .def("__call__",
            [](PyRestorer* self, const PyImage& img) -> py::array {
              return self->Apply(std::vector{img})[0];
